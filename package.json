@@ -1,0 +1,19 @@
+{
+  "name": "RFV2017",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "webpack --config mywebpack.config.js"
+  },
+  "keywords": [],
+  "author": "Tino Kastbjerg Stigsen",
+  "license": "ISC",
+  "devDependencies": {
+    "webpack": "^2.4.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tinoks/RFV2017.git"
+  },
+}
