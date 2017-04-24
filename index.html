@@ -1,0 +1,134 @@
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>RFV 2017</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons"  rel="stylesheet" async>
+  <meta http-equiv="Cache-control" content="public">
+
+</head>
+<body>
+
+
+<style>
+
+body { 
+  padding: 0; 
+  margin: 0;
+  overflow-y: hidden;
+}
+
+html, body, #map {
+    height: 100vh;
+    width: 100vw;
+}
+
+#map {
+    font: 12px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
+    overflow: hidden;
+    position: relative;
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
+}
+
+nav {
+  width: 40px;
+	position: absolute;
+	z-index: 99999;
+
+}
+
+nav a {
+  display: block; 
+  text-align: center;
+	padding:8px;
+  transition: all 3s ease;
+  color: #4f4d56; 
+  font-size:24px;
+	cursor: pointer;
+  user-select: none;
+
+}
+
+nav#top{
+	height: calc(100% - 120px);
+  height: -moz-calc(100% - 120px);
+  height: -webkit-calc(100% - 120px);
+	top: 0px;
+	overflow: hidden;
+}
+
+nav#bottom{
+	height: 80px;
+	bottom: 0px;
+}
+
+
+nav a:hover {
+    background: linear-gradient(to right, #b93a3a 0%,#b93a3a 10%,#000000 10%,rgba(0, 0, 0, 0) 10%,rgba(0, 0, 0, 0) 100%); /* W3C */
+}
+
+nav .active {
+    background: linear-gradient(to right, #b93a3a 0%,#b93a3a 10%,#000000 10%,rgba(0, 0, 0, 0) 10%,rgba(0, 0, 0, 0) 100%); /* W3C */
+}
+
+.img-circle {
+    border-radius: 50%;
+	width: 24px;
+}
+
+a.mapboxgl-ctrl-logo {
+	visibility:hidden;
+}
+
+
+</style>
+
+<style>
+#sidebar{
+	position: absolute;
+	z-index:999999;
+  margin: 0 0 0 20; 
+  box-shadow: 0px 0px 20px black; 
+  height:100vh;
+  width:260px;
+	padding:20px;
+  background: white;
+	right:-300px;
+	transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+	box-shadow: 0px 0px 0px black; 
+}
+#sidebar.active {
+	right:0;
+	box-shadow: 0px 0px 20px black; 
+}
+
+</style>
+
+<nav id="top">
+  <a onclick='rotation()'><i class="material-icons">3d_rotation</i></a> 
+  <a onclick='fullscreen(this)'><i class="material-icons">fullscreen</i></a> 
+  <a><i class="material-icons" style="transition:30s">gps_fixed</i></a> 
+  <div style="height:24px"></div>
+  <a onclick='document.getElementById("sidebar").classList.toggle("active")'><i class="material-icons">toc</i></a> 
+  <a onclick='fix()'><i class="material-icons">gesture</i></a> 
+  <a><i class="material-icons">unarchive</i></a> 
+  <a><i class="material-icons">widgets</i></a> 
+</nav>
+<nav id="bottom">
+  <a><img class="img-circle" src="https://lh3.googleusercontent.com/-DvxLpCVpOmU/AAAAAAAAAAI/AAAAAAAAAAA/_m8iZpH3_qw/photo.jpg"></a> 
+  <a><i class="material-icons">settings</i></a> 
+</nav>
+
+<div id="map">
+  <div id="sidebar">
+    <p>
+      Lorem ipsum  sit amet, consectetur adipiscing elit. Cras vestibulum lacus et eros condimentum rhoncus. Morbi sollicitudin convallis leo, eu rutrum augue tempus sit amet. Mauris blandit ullamcorper molestie. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. In vel erat imperdiet, sodales odio eu, cursus nibh. Maecenas sit amet magna eget leo pulvinar elementum in at nunc. Nam iaculis, nulla non efficitur imperdiet, nibh eros imperdiet libero, sit amet hendrerit quam lacus a metus. Nam feugiat porta purus ac dictum. Suspendisse a faucibus nibh. Proin placerat purus quis eleifend posuere. Etiam accumsan nulla tincidunt faucibus maximus. Integer molestie justo pretium quam iaculis, sit amet posuere mi malesuada. Fusce egestas rutrum massa eget dignissim. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed maximus justo eget neque scelerisque, nec tincidunt turpis venenatis. Nam risus purus, viverra id justo ac, dignissim laoreet orci.
+    </p>
+  </div>
+</div>
+
+  <script src="bundle.js" async></script>
+
+</body>
+</html>

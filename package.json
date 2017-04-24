@@ -2,18 +2,26 @@
   "name": "RFV2017",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "./app/index.js",
   "scripts": {
-    "start": "webpack --config mywebpack.config.js"
+    "start": "webpack --config mywebpack.config.js",
+    "dev": "webpack-dev-server --progress --inline --hot"
   },
   "keywords": [],
   "author": "Tino Kastbjerg Stigsen",
-  "license": "ISC",
+  "license": "beerware",
   "devDependencies": {
-    "webpack": "^2.4.1"
+    "css-loader": "^0.28.0",
+    "style-loader": "^0.16.1",
+    "webpack": "^2.4.1",
+    "webpack-dev-server": "^2.4.4"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/tinoks/RFV2017.git"
   },
+  "dependencies": {
+    "mapbox-gl": "^0.36.0",
+    "perfect-scrollbar": "^0.6.16"
+  }
 }

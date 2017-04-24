@@ -1,8 +1,4 @@
 node_modules
-vendor
 npm-debug.log
-.gobble-build
+vendor
 dist
-.gobble
-.gobble-build
-.gobble-watch
