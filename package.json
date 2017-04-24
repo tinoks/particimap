@@ -4,24 +4,28 @@
   "description": "",
   "main": "./app/index.js",
   "scripts": {
-    "start": "webpack --config mywebpack.config.js",
-    "dev": "webpack-dev-server --progress --inline --hot"
+    "dev": "webpack-dev-server --progress --inline --hot",
+    "build": "webpack --optimize-minimize  & firebase deploy"
   },
   "keywords": [],
   "author": "Tino Kastbjerg Stigsen",
   "license": "beerware",
-  "devDependencies": {
-    "css-loader": "^0.28.0",
-    "style-loader": "^0.16.1",
-    "webpack": "^2.4.1",
-    "webpack-dev-server": "^2.4.4"
-  },
   "repository": {
     "type": "git",
     "url": "https://github.com/tinoks/RFV2017.git"
   },
   "dependencies": {
+    "alasql": "^0.3.9",
     "mapbox-gl": "^0.36.0",
     "perfect-scrollbar": "^0.6.16"
+  },
+  "devDependencies": {
+    "compression-webpack-plugin": "^0.4.0",
+    "css-loader": "^0.28.0",
+    "riot": "^3.4.2",
+    "style-loader": "^0.16.1",
+    "tag-loader": "^0.3.0",
+    "webpack": "^2.4.1",
+    "webpack-dev-server": "^2.4.4"
   }
 }

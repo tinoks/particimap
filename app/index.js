@@ -1,7 +1,18 @@
+
 window.Ps = require('perfect-scrollbar');
 require('./css/perfect-scrollbar.css');
 
-
+settings = function(){
+	if(document.getElementsByTagName("sidebar").length == 1){
+		document.getElementsByTagName("sidebar")[0].classList.toggle("active")
+	} else {
+		require('./tags/sidebar.tag');
+		document.getElementById('map').appendChild(document.createElement("sidebar"))
+		riot.mount('sidebar',{ title: 'My TODO app', items: [ 'A','B','C' ] })
+		Ps.initialize(document.getElementsByTagName("sidebar")[0]);
+		document.getElementsByTagName("sidebar")[0].classList.toggle("active")
+	}
+}
 
 Ps.initialize(document.getElementById('top'));
 	
@@ -25,12 +36,19 @@ Ps.initialize(document.getElementById('top'));
     }
   }
 
+rotation = function(){
+	if(map.getPitch() == 0){
+	map.easeTo({pitch: 60})
+	} else{
+	map.easeTo({pitch: 0})
+	}
+}
+
 fullscreen = function(el){
 	innerText = el.children[0].innerText;
 	
 	if(innerText == "fullscreen"){
 		var i = document.body;
-
 		// go full-screen
 		if (i.requestFullscreen) {
 			i.requestFullscreen();
@@ -58,12 +76,91 @@ fullscreen = function(el){
 
 }
 
-rotation = function(){
-	if(map.getPitch() == 0){
-	map.easeTo({pitch: 60})
-	} else{
-	map.easeTo({pitch: 0})
+gps = function(el){
+	if(map.getSource('point') == undefined) {
+		map.addSource('point', {
+		        "type": "geojson",
+		        "data": {"type": "Point","coordinates": [0, 0]}
+		    });
+
+  if(!('ontouchstart' in document.documentElement)) {
+
+			var framesPerSecond = 15; 
+			var initialOpacity = 1
+			var opacity = initialOpacity;
+			var initialRadius = 8;
+			var radius = initialRadius;
+			var maxRadius = 18;
+
+		    function animateMarker() {
+		        setTimeout(function(){
+		            requestAnimationFrame(animateMarker);
+
+		            radius += (maxRadius - radius) / framesPerSecond;
+		            opacity -= ( 1 / framesPerSecond );
+		            if (opacity <= 0) {
+		                radius = initialRadius;
+		                opacity = initialOpacity;
+		            }
+		            if(map.getLayer('GPSpoint') != undefined){
+			            map.setPaintProperty('GPSpoint', 'circle-radius', radius);
+			            map.setPaintProperty('GPSpoint', 'circle-opacity', opacity);
+		            }
+
+		        }, 1000 / framesPerSecond);
+		    }
+		    animateMarker()
+		  }
 	}
+
+
+	if(el.classList.value == "off"){
+			var options = {
+			  enableHighAccuracy: true,
+			  timeout: 5000,
+			  maximumAge: 0
+			};
+
+
+
+
+		    map.addLayer({
+		        "id": "GPSpoint",
+		        "source": "point",
+		        "type": "circle",
+		        "paint": {
+		            "circle-radius": 8,
+		            "circle-radius-transition": {duration: 0},
+		            "circle-opacity-transition": {duration: 0},
+		            "circle-color": "#d11d1d"
+		        }
+		    });	
+
+
+
+			function success(pos) {
+			  var crd = pos.coords;
+			  el.classList.value = "on";
+			  map.getSource('point').setData({"type": "Point","coordinates": [crd.longitude,crd.latitude]});
+			  map.easeTo({
+			  	bearing: crd.heading || 0,
+			  	center: [crd.longitude,crd.latitude]
+			  })
+			};
+
+			function error(err) {
+			  alert('ERROR('+err.code+' '+ err.message+')');
+			};
+
+			id = navigator.geolocation.watchPosition(success, error, options);
+			
+		}
+	else {
+		map.removeLayer('GPSpoint')
+		navigator.geolocation.clearWatch(id);
+		el.classList.value = "off";
+	}
+
 }
 
 
@@ -72,9 +169,11 @@ mapboxgl.accessToken = 'pk.eyJ1IjoidGlub2tzIiwiYSI6Ikp4OE0yWjQifQ.8ShzvCuk6zpjf9
 map = new mapboxgl.Map({
     container: 'map', // container id
     style: 'mapbox://styles/mapbox/streets-v9', //stylesheet location
-    center: [-74.50, 40], // starting position
-    zoom: 9,
+    center: [10.6, 56.3], // starting position
+    zoom: 7,
 	attributionControl: false})
     .addControl(new mapboxgl.AttributionControl({
         compact: true
-    }));;
+    }));
+
+document.getElementsByClassName("mapboxgl-control-container")[0].remove()
