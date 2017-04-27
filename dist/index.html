@@ -1,0 +1,121 @@
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>RFV 2017</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons"  rel="stylesheet" async>
+  <meta http-equiv="Cache-control" content="public">
+
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="icon" sizes="192x192" href="images/android-desktop.png">
+
+  <style>
+
+    body { 
+      padding: 0; 
+      margin: 0;
+      overflow-y: hidden;
+    }
+
+    html, body, #map {
+        height: 100vh;
+        width: 100vw;
+    }
+
+    #map {
+        font: 12px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
+        overflow: hidden;
+        position: relative;
+        -webkit-tap-highlight-color: rgba(0,0,0,0);
+    }
+
+    nav {
+      width: 40px;
+      position: absolute;
+      z-index: 99999;
+      pointer-events: none;
+    }
+
+    nav a {
+      pointer-events: all;
+      display: block; 
+      text-align: center;
+      padding:8px;
+      transition: all 3s ease;
+      color: #4f4d56; 
+      font-size:24px;
+      cursor: pointer;
+      user-select: none;
+
+    }
+
+    nav#top{
+      height: calc(100% - 120px);
+      height: -moz-calc(100% - 120px);
+      height: -webkit-calc(100% - 120px);
+      top: 0px;
+      overflow: hidden;
+    }
+
+    nav#bottom{
+      height: 80px;
+      bottom: 0px;
+    }
+
+
+    nav a:hover {
+        background: linear-gradient(to right, #4286f4 0%,#4286f4 10%,#000000 10%,rgba(0, 0, 0, 0) 10%,rgba(0, 0, 0, 0) 100%); /* W3C */
+    }
+
+    nav .show {
+        background: linear-gradient(to right, #4286f4 0%,#4286f4 10%,#000000 10%,rgba(0, 0, 0, 0) 10%,rgba(0, 0, 0, 0) 100%); /* W3C */
+    }
+
+    nav .off {
+        background: linear-gradient(to right, #b93a3a 0%,#b93a3a 10%,#000000 10%,rgba(0, 0, 0, 0) 10%,rgba(0, 0, 0, 0) 100%); /* W3C */
+    }
+
+    nav .on {
+        background: linear-gradient(to right, #09bc4e 0%,#09bc4e 10%,#000000 10%,rgba(0, 0, 0, 0) 10%,rgba(0, 0, 0, 0) 100%); /* W3C */
+    }
+
+    .img-circle {
+      border-radius: 50%;
+      width: 24px;
+    }
+
+    a.mapboxgl-ctrl-logo {
+      visibility:hidden;
+    }
+  </style>
+
+</head>
+<body>
+
+
+
+  <nav id="top">
+
+    <a onclick='rotation(this)'><i class="material-icons">3d_rotation</i></a> 
+    <a onclick='fullscreen(this)'><i class="material-icons"  style="transition:3s">fullscreen</i></a> 
+    <a onclick='gps(this);' class="off"><i class="material-icons">gps_fixed</i></a> 
+    
+    <div style="height:24px"></div>
+
+    <a onclick='table(this)'><i class="material-icons">toc</i></a> 
+    <a onclick='this.classList.toggle("show")'><i class="material-icons">supervisor_account</i></a> 
+    <a onclick='upload(this)'><i class="material-icons">file_upload</i></a> 
+  
+  </nav>
+
+  <nav id="bottom">
+    <a onclick='user(this)'><img class="img-circle" src="https://lh3.googleusercontent.com/-DvxLpCVpOmU/AAAAAAAAAAI/AAAAAAAAAAA/_m8iZpH3_qw/photo.jpg"></a> 
+    <a onclick='settings(this)'><i class="material-icons">settings</i></a> 
+  </nav>
+
+  <div id="map"></div>
+  <script src="bundle.js" async></script>
+
+</body>
+</html>

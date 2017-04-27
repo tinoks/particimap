@@ -5,7 +5,7 @@
   "main": "./app/index.js",
   "scripts": {
     "dev": "webpack-dev-server --progress --inline --hot",
-    "build": "webpack --optimize-minimize  & firebase deploy"
+    "build": "webpack & firebase deploy"
   },
   "keywords": [],
   "author": "Tino Kastbjerg Stigsen",
@@ -16,8 +16,13 @@
   },
   "dependencies": {
     "alasql": "^0.3.9",
+    "desandro-classie": "^1.0.1",
+    "izitoast": "^1.1.1",
+    "javascript-debounce": "^1.0.0",
     "mapbox-gl": "^0.36.0",
-    "perfect-scrollbar": "^0.6.16"
+    "perfect-scrollbar": "^0.6.16",
+    "riot-md-table": "0.0.2",
+    "underscore": "^1.8.3"
   },
   "devDependencies": {
     "compression-webpack-plugin": "^0.4.0",
