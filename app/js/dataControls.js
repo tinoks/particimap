@@ -4,45 +4,74 @@ table = function(el){
     document.getElementsByTagName("tablebar")[0].classList.toggle("show")
     el.classList.toggle("show");
   } else {
-    require('../tags/tablebar_copy.tag');
-    _ = require('underscore');
-    document.getElementById('map').appendChild(document.createElement("tablebar"));
-
-    alasql("ATTACH INDEXEDDB DATABASE KORTxyz; \
-            USE KORTxyz; \
-            SELECT * FROM marker", function(e){
-              KORTxyz.tabledata = e[2]
-               riot.mount('tablebar');
-            }
-    );
-
-   // riot.mount('tablebar');
-    Ps.initialize(document.getElementsByTagName("tablebar")[0]);
-    document.getElementsByTagName("tablebar")[0].classList.toggle("show");
-    el.classList.toggle("show");
-  }
-  /*
-    if(document.getElementsByTagName("tablebar").length == 1){
-      document.getElementsByTagName("tablebar")[0].classList.toggle("show")
-      el.classList.toggle("show");
-    } else {
-
+    
     require('../tags/tablebar.tag');
     document.getElementById('map').appendChild(document.createElement("tablebar"));
-
-
-    alasql("ATTACH INDEXEDDB DATABASE KORTxyz; \
-            USE KORTxyz; \
-            SELECT EjerNr FROM marker", function(e){
-              KORTxyz.tabledata = e[2]
-              riot.mount('tablebar');
-            }
-    );
-
+    riot.mount('tablebar');
+    Ps.initialize(document.getElementsByTagName("tablebar")[0]);
     document.getElementsByTagName("tablebar")[0].classList.toggle("show");
+
     el.classList.toggle("show");
   }
-*/
+
+}
+
+
+addData = function(){
+
+
+  map.addSource('marker', {
+      type: 'geojson',
+      data: {"type": "FeatureCollection","features": KORTxyz.data.map(function(obj) {
+                returndata = {properties:{}};
+                  Object.keys(obj).map(function(objectKey, index) {
+                  if(objectKey != "geom"){ returndata.properties[objectKey] = obj[objectKey] }
+                else{ returndata.geometry = obj[objectKey]; }
+                  });
+                return returndata;
+              })
+            }
+    });
+
+    map.addLayer({
+        'id': 'markerLinjer',
+        'type': 'line',
+        'source': 'marker',
+        'layout': {},
+        'paint': {
+            'line-color': '#088',
+            'line-opacity': 0.8
+        }
+    }, 'waterway-label');     
+
+
+    map.addLayer({
+        'id': 'markerPolygon',
+        'type': 'fill',
+        'source': 'marker',
+        'layout': {},
+        'paint': {
+            'fill-color': '#088',
+            'fill-opacity': 0.6
+        }
+    }, 'markerLinjer');
+
+    map.on('click', 'markerPolygon', function (e) {
+        new mapboxgl.Popup()
+            .setLngLat(e.lngLat)
+            .setHTML('<h2>'+e.features[0].properties.EjerNr+'</h2>')
+            .addTo(map);
+    });
+
+
+    alasql("DROP TABLE IF EXISTS data; \
+    CREATE TABLE data; \
+    SELECT * INTO data FROM ?", [KORTxyz.data], function(){
+      console.log("OK")
+    });
+  
+  
+
 }
 
 upload = function(){
@@ -51,7 +80,7 @@ upload = function(){
     xmlhttp.onreadystatechange = function() {
         if (xmlhttp.readyState == XMLHttpRequest.DONE ) {
            if (xmlhttp.status == 200) {
-               KORTxyz.data = JSON.parse(xmlhttp.responseText);
+               KORTxyz.data = JSON.parse(xmlhttp.responseText).features.map(function(e) {obj=e.properties; obj["geom"] = e.geometry; return obj});
                addData();
            }
            else if (xmlhttp.status == 400) {
@@ -75,58 +104,5 @@ upload = function(){
     xmlhttp.send();
 
 
-    function addData(){
 
-   // alasql("DROP INDEXEDDB DATABASE IF EXISTS KORTxyz");
-
-
-	map.addSource('marker', {
-	    type: 'geojson',
-	    data: KORTxyz.data
-		});
-
-    map.addLayer({
-        'id': 'markerLinjer',
-        'type': 'line',
-        'source': 'marker',
-        'layout': {},
-        'paint': {
-            'line-color': '#088',
-            'line-opacity': 0.8
-        }
-    }, 'waterway-label');    	
-
-
-    map.addLayer({
-        'id': 'markerPolygon',
-        'type': 'fill',
-        'source': 'marker',
-        'layout': {},
-        'paint': {
-            'fill-color': '#088',
-            'fill-opacity': 0.6
-        }
-    }, 'markerLinjer');
-
-    map.on('click', 'markerPolygon', function (e) {
-        new mapboxgl.Popup()
-            .setLngLat(e.lngLat)
-            .setHTML('<h2>'+e.features[0].properties.EjerNr+'</h2>')
-            .addTo(map);
-    });
-
-	geomdb = KORTxyz.data.features.map(function(e) {obj=e.properties; obj["geom"] = e.geometry.coordinates; return obj});
-
-    alasql("CREATE INDEXEDDB DATABASE IF NOT EXISTS KORTxyz;\
-        ATTACH INDEXEDDB DATABASE KORTxyz; \
-        USE KORTxyz; \
-        DROP TABLE IF EXISTS marker; \
-		CREATE TABLE marker; \
-		SELECT * INTO marker FROM ?", [geomdb], function(){
-			console.log("OK")
-		});
-	
-	
-
-    }
 }

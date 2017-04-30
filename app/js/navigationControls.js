@@ -173,3 +173,28 @@ gps = function(el){
 
 }
 
+luftfoto = function(el){
+	if(typeof map.getSource('GSTsource') == "undefined"){
+		map.addSource(
+			"GSTsource",{
+				"type": "raster",
+				"tiles": ["https://services.kortforsyningen.dk/orto_foraar_webm?login=StatForvaltIT&password=180laksp&SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=orto_foraar&STYLE=default&TILEMATRIXSET=GoogleMapsCompatible&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}&FORMAT=image%2Fjpeg"],
+				"tileSize": 256
+			}
+		);
+	}
+
+	if(typeof map.getLayer('GST')  == "undefined"){
+	    map.addLayer({
+	        'id': 'GST',
+	        'type': 'raster',
+	        'source': "GSTsource",
+			"minzoom": 0,
+	        "maxzoom": 19
+	    }, 'aeroway-taxiway');
+	}
+	else{
+		map.removeLayer('GST');
+	}
+
+}

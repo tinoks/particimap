@@ -44,10 +44,11 @@ require('../node_modules/izitoast/dist/css/iziToast.css');
       }
     }
   }
+
+
 require('./js/navigationControls.js');
 require('./js/dataControls.js');
 require('./js/bottomControls.js');
-
 
 
 mapboxgl = require('mapbox-gl');
@@ -59,8 +60,23 @@ map = new mapboxgl.Map({
     style: 'mapbox://styles/mapbox/streets-v9', //stylesheet location
     center: [10.6, 56.3], // starting position
     zoom: 7,
+    maxZoom: 19,
 	attributionControl: false});
 
 document.getElementsByClassName("mapboxgl-control-container")[0].remove()
 
 alasql = require('alasql');
+
+alasql("CREATE INDEXEDDB DATABASE IF NOT EXISTS KORTxyz; \
+        ATTACH INDEXEDDB DATABASE KORTxyz; \
+        USE KORTxyz;", function(e){
+          alasql(['SELECT * FROM data;'])
+                .then(function(res){
+                     KORTxyz.data = res[0];
+                     addData()
+                }).catch(function(err){
+                     console.log('Does the file exist? There was an error:', err);
+                });
+        });
+
+
