@@ -51,19 +51,32 @@ require('./js/dataControls.js');
 require('./js/bottomControls.js');
 
 
-mapboxgl = require('mapbox-gl');
-require('../node_modules/mapbox-gl/dist/mapbox-gl.css');
 
-mapboxgl.accessToken = 'pk.eyJ1IjoidGlub2tzIiwiYSI6Ikp4OE0yWjQifQ.8ShzvCuk6zpjf9n_1pS_fA';
-map = new mapboxgl.Map({
-    container: 'map', // container id
-    style: 'mapbox://styles/mapbox/streets-v9', //stylesheet location
-    center: [10.6, 56.3], // starting position
-    zoom: 7,
-    maxZoom: 19,
-	attributionControl: false});
 
-document.getElementsByClassName("mapboxgl-control-container")[0].remove()
+
+// Detect to use Leaflet or Mapbox based on webGL support (CITRIX)
+detectWebGL = function(){
+  var test_canvas = document.createElement('canvas');
+  var gl = null;
+
+  try {gl = test_canvas.getContext('webgl')}
+  catch(err) {gl = null}
+
+  if(!gl){
+    try { gl = text_canvas.getContext('experimental-webgl') }
+    catch(err) { gl = null }
+  }
+
+  //return false
+  return gl ? true : false
+
+}
+
+if (detectWebGL()){ require('./map/mapbox.js'); }
+else{  require('./map/leaflet.js'); }
+
+
+
 
 alasql = require('alasql');
 
@@ -78,5 +91,3 @@ alasql("CREATE INDEXEDDB DATABASE IF NOT EXISTS KORTxyz; \
                      console.log('Does the file exist? There was an error:', err);
                 });
         });
-
-

@@ -185,6 +185,7 @@ luftfoto = function(el){
 	}
 
 	if(typeof map.getLayer('GST')  == "undefined"){
+		el.classList = "show";
 	    map.addLayer({
 	        'id': 'GST',
 	        'type': 'raster',
@@ -194,6 +195,7 @@ luftfoto = function(el){
 	    }, 'aeroway-taxiway');
 	}
 	else{
+		el.classList = "show";
 		map.removeLayer('GST');
 	}
 
