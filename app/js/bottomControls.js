@@ -1,6 +1,15 @@
 user = function(el){
-	console.log(el);
-
+  if(document.getElementsByTagName("userbar").length == 1){
+    document.getElementsByTagName("userbar")[0].classList.toggle("show")
+    el.classList.toggle("show");
+  } else {
+    require('../tags/userbar.tag');
+    document.getElementById('map').appendChild(document.createElement("userbar"));
+    riot.mount('userbar',{});
+    Ps.initialize(document.getElementsByTagName("userbar")[0]);
+    document.getElementsByTagName("userbar")[0].classList.toggle("show");
+    el.classList.toggle("show");
+  }
 }
 
 
