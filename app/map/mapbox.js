@@ -10,9 +10,10 @@ map = new mapboxgl.Map({
     maxZoom: 18,
   attributionControl: false});
 
-document.getElementsByClassName("mapboxgl-control-container")[0].remove()
+//document.getElementsByClassName("mapboxgl-control-container")[0].remove()
 
-
+map.addControl(new mapboxgl.ScaleControl(),'bottom-right');
+document.getElementsByClassName('mapboxgl-ctrl-scale')[0].style["border-color"] = "#4f4d56"
 
 addData = function(){
 

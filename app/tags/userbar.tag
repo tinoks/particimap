@@ -57,16 +57,25 @@
         } 
 
         xmlHttp.open("GET",
-                "http://jordbrugsanalyser.dk/geoserver/ows?"+
-                "service=WFS&version=1.0.0&request=GetFeature&srsName=EPSG:4326&"+
-                "typeName=Jordbrugsfhanalyser:CHR15&propertyName=the_geom,CVRNR&outputFormat=json"+
-                "&maxFeatures=1",
+                "http://jordbrugsanalyser.dk/geoserver/wms?"+
+                "request=GetCapabilities",
                 true,name,pw);
         xmlHttp.send(null);
         xmlHttp.onreadystatechange = function() {
           if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
               KORTxyz.user = { name:name, pw:pw};
-              console.log("DSone")
+              parser = new DOMParser();
+              xmlDoc = parser.parseFromString(xmlHttp.responseText,"text/xml");
+              Layers = xmlDoc.getElementsByTagName("Layer")[0].getElementsByTagName("Layer")
+              KORTxyz.sources = [];
+              for (i = 0; i < Layers.length; i++) {
+                  KORTxyz.sources.push({
+                    name: Layers[i].getElementsByTagName("Name")[0].innerHTML,
+                    title: Layers[i].getElementsByTagName("Title")[0].innerHTML,
+                    abstract: Layers[i].getElementsByTagName("Abstract")[0].innerHTML
+                  })
+              }
+
           }
           else if(xmlHttp.readyState == 4 && xmlHttp.status != 200){
             iziToast.error({

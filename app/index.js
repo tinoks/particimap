@@ -86,7 +86,7 @@ alasql("CREATE INDEXEDDB DATABASE IF NOT EXISTS KORTxyz; \
           alasql(['SELECT * FROM data;'])
                 .then(function(res){
                      KORTxyz.data = res[0];
-                     addData()
+                     addData();
                 }).catch(function(err){
                      console.log('Does the file exist? There was an error:', err);
                 });
