@@ -25,6 +25,10 @@ upload = function(){
         if (xmlhttp.readyState == XMLHttpRequest.DONE ) {
            if (xmlhttp.status == 200) {
                KORTxyz.data = JSON.parse(xmlhttp.responseText).features.map(function(e) {obj=e.properties; obj["geom"] = e.geometry; return obj});
+               KORTxyz.data.update = function(svar,id){
+                  
+                  
+               }
                addData();
            }
            else if (xmlhttp.status == 400) {

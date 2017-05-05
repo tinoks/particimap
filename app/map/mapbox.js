@@ -8,7 +8,7 @@ map = new mapboxgl.Map({
     center: [10.6, 56.3], // starting position
     zoom: 7,
     maxZoom: 18,
-  attributionControl: false});
+    attributionControl: false});
 
 //document.getElementsByClassName("mapboxgl-control-container")[0].remove()
 
@@ -21,7 +21,7 @@ addData = function(){
     map.removeLayer('dataLines'); 
     map.removeLayer('dataPolygon'); 
     map.removeSource('data');
-  } 
+  }
 
 
   map.addSource('data', {
@@ -63,7 +63,11 @@ addData = function(){
     map.on('click', 'dataPolygon', function (e) {
         new mapboxgl.Popup({closeButton:false})
             .setLngLat(e.lngLat)
-            .setHTML('<h2>'+e.features[0].properties.AfgKat+'</h2>')
+            .setHTML(
+              '<h2>'+e.features[0].properties.AfgKat+'</h2>'+
+              '<button onclick="console.log('+e.features[0].properties.MarkNr+')" style="background-color:green;font-family:helvetica;border:0;width:50%;height:32px;">  JA  </button>'+
+              '<button onclick="console.log('+e.features[0].properties.MarkNr+')" style="background-color:red;font-family:helvetica;border:0;width:50%;height:32px;">  NEJ  </button>'
+            )
             .addTo(map);
     });
 

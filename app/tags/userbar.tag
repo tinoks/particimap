@@ -56,24 +56,34 @@
           this.update();
         } 
 
-        xmlHttp.open("GET",
-                "http://jordbrugsanalyser.dk/geoserver/wms?"+
-                "request=GetCapabilities",
-                true,name,pw);
+        function authenticateUser(user, password)
+        {
+            var token = user + ":" + password;
+
+            // Should i be encoding this value????? does it matter???
+            // Base64 Encoding -> btoa
+            var hash = btoa(token); 
+
+            return "Basic " + hash;
+        }
+
+        xmlHttp.open("GET","http://vpctinkas/geoserver/wms?"+
+                      "request=getCapabilites",true,name,pw);
+
         xmlHttp.send(null);
         xmlHttp.onreadystatechange = function() {
           if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
               KORTxyz.user = { name:name, pw:pw};
-              parser = new DOMParser();
-              xmlDoc = parser.parseFromString(xmlHttp.responseText,"text/xml");
-              Layers = xmlDoc.getElementsByTagName("Layer")[0].getElementsByTagName("Layer")
               KORTxyz.sources = [];
-              for (i = 0; i < Layers.length; i++) {
+              xmlDoc = xmlHttp.responseXML.children[0].children[1].children[2].children;
+              for (var i = 0; i < xmlDoc.length; i++) {
+                if(xmlDoc[i].nodeName == "Layer"){
                   KORTxyz.sources.push({
-                    name: Layers[i].getElementsByTagName("Name")[0].innerHTML,
-                    title: Layers[i].getElementsByTagName("Title")[0].innerHTML,
-                    abstract: Layers[i].getElementsByTagName("Abstract")[0].innerHTML
+                    name: xmlDoc[i].children[0].textContent,
+                    title: xmlDoc[i].children[1].textContent,
+                    abstract: xmlDoc[i].children[2].textContent
                   })
+                }
               }
 
           }
