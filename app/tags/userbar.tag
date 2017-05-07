@@ -24,8 +24,10 @@
   <!-- logic -->
   <script>
 
+  
   this.noUser = !(!!KORTxyz.user);
   this.buttontext = !(!!KORTxyz.user) ? "Login" : "Logout";
+
   this.loading = false;
 
   isused = function(el){
@@ -56,35 +58,29 @@
           this.update();
         } 
 
-        function authenticateUser(user, password)
-        {
-            var token = user + ":" + password;
-
-            // Should i be encoding this value????? does it matter???
-            // Base64 Encoding -> btoa
-            var hash = btoa(token); 
-
-            return "Basic " + hash;
-        }
-
-        xmlHttp.open("GET","http://vpctinkas/geoserver/wms?"+
-                      "request=getCapabilites",true,name,pw);
+        xmlHttp.open("GET",config.server+
+                      "service=wfs&version=1.1.0&request=GetCapabilities",
+                      true,name,pw);
 
         xmlHttp.send(null);
+
         xmlHttp.onreadystatechange = function() {
           if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
               KORTxyz.user = { name:name, pw:pw};
+              localStorage.setItem('name',name);
+              localStorage.setItem('pw',pw);
               KORTxyz.sources = [];
-              xmlDoc = xmlHttp.responseXML.children[0].children[1].children[2].children;
+              xmlDoc = xmlHttp.responseXML.getElementsByTagName("FeatureType");
               for (var i = 0; i < xmlDoc.length; i++) {
-                if(xmlDoc[i].nodeName == "Layer"){
                   KORTxyz.sources.push({
-                    name: xmlDoc[i].children[0].textContent,
-                    title: xmlDoc[i].children[1].textContent,
-                    abstract: xmlDoc[i].children[2].textContent
+                    name: xmlDoc[i].getElementsByTagName("Name")[0].textContent,
+                    title: xmlDoc[i].getElementsByTagName("Title")[0].textContent,
+                    abstract: xmlDoc[i].getElementsByTagName("Abstract")[0].textContent
                   })
-                }
               }
+              alasql("DROP TABLE IF EXISTS sources; \
+                      CREATE TABLE sources; \
+                      SELECT * INTO sources FROM ?", [KORTxyz.sources],function(){});
 
           }
           else if(xmlHttp.readyState == 4 && xmlHttp.status != 200){
@@ -105,9 +101,10 @@
       }
     } else {
       delete KORTxyz.user;
-    }
       this.noUser = !(!!KORTxyz.user);
       this.buttontext = !(!!KORTxyz.user) ? "Login" : "Logout";
+    }
+
    }
 
 </script>

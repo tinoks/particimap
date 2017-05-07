@@ -16,6 +16,24 @@ table = function(el){
 
 }
 
+cloud_open = function(el){
+
+  if(document.getElementsByTagName("cloud_openbar").length == 1){
+    document.getElementsByTagName("cloud_openbar")[0].classList.toggle("show")
+    el.classList.toggle("show");
+  } else {
+    
+    require('../tags/cloud_openbar.tag');
+    document.getElementById('map').appendChild(document.createElement("cloud_openbar"));
+    riot.mount('cloud_openbar');
+    Ps.initialize(document.getElementsByTagName("cloud_openbar")[0]);
+    document.getElementsByTagName("cloud_openbar")[0].classList.toggle("show");
+
+    el.classList.toggle("show");
+  }
+
+}
+
 
 
 upload = function(){
@@ -30,6 +48,16 @@ upload = function(){
                   
                }
                addData();
+              alasql("DROP TABLE IF EXISTS data; \
+                      CREATE TABLE data; \
+                      SELECT * INTO data FROM ?", [KORTxyz.data], 
+                      function(){
+                          iziToast.show({
+                            icon: 'material-icons',
+                            iconText: 'error',
+                            message: 'Data added!'
+                          });
+                      });
            }
            else if (xmlhttp.status == 400) {
       		  iziToast.error({

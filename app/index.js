@@ -1,19 +1,24 @@
-window.riot = riot;
-window.KORTxyz = {
+riot = riot;
+KORTxyz = {
 	settings: {
-		followCompas:false
-	}
+		followCompas: JSON.parse(localStorage.getItem('followCompas')),
+    useWebGL: JSON.parse(localStorage.getItem('useWebGL'))
+	},
+  user:{
+    name: localStorage.getItem('name'),
+    pw: localStorage.getItem('pw')
+  }
 };
 
-window.Ps = require('perfect-scrollbar');
+Ps = require('perfect-scrollbar');
 require('./css/perfect-scrollbar.css');
 Ps.initialize(document.getElementById('top'));
 
-window.iziToast = require('izitoast');
+iziToast = require('izitoast');
 require('../node_modules/izitoast/dist/css/iziToast.css');
 
 
- // SPECIAL RULES FOR MOBILE! 
+ // SPECIAL RULES FOR MOBILE. Fix buttonclicks! 
 
   if('ontouchstart' in document.documentElement) {
 
@@ -69,25 +74,26 @@ detectWebGL = function(){
 
   //return false
   return gl ? true : false
-
 }
 
-if (detectWebGL()){ require('./map/mapbox.js'); }
-else{  require('./map/leaflet.js'); }
 
-
+if(JSON.parse(KORTxyz.settings.useWebGL) && detectWebGL()){
+  require('./map/mapbox.js'); 
+}else{
+  require('./map/leaflet.js'); 
+}
 
 
 alasql = require('alasql');
 
 alasql("CREATE INDEXEDDB DATABASE IF NOT EXISTS KORTxyz; \
         ATTACH INDEXEDDB DATABASE KORTxyz; \
-        USE KORTxyz;", function(e){
-          alasql(['SELECT * FROM data;'])
-                .then(function(res){
-                     KORTxyz.data = res[0];
-                     addData();
-                }).catch(function(err){
-                     console.log('Does the file exist? There was an error:', err);
-                });
+        USE KORTxyz; \
+        CREATE TABLE IF NOT EXISTS data; \
+        SELECT * FROM data; \
+        CREATE TABLE IF NOT EXISTS sources; \
+        SELECT * FROM sources", function(e){
+          KORTxyz.data = e[4];
+          addData();
+          KORTxyz.sources = e[6];
         });

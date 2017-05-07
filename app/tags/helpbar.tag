@@ -23,8 +23,8 @@
     {icon:"toc",
      text:"Tabeloversigt over markerne"},
 
-    {icon:"supervisor_account",
-     text:"Hvor langt de enkelte ansøgere er fra at opfylde KFA"},
+    {icon:"cloud_upload",
+     text:"Indlæs data fra din webservice"},
 
     {icon:"file_upload",
      text:"Indlæser data på kortet"},

@@ -3,19 +3,40 @@
   <!-- layout -->
 <div id="container">
   <label class="switch">
-    <input type="checkbox" id="Foelgcompas" onclick="KORTxyz.settings.followCompas? KORTxyz.settings.followCompas=false : KORTxyz.settings.followCompas=true">
-    <div class="slider round"></div>
+    <input type="checkbox" id="Foelgcompas" 
+      onclick="KORTxyz.settings.followCompas? KORTxyz.settings.followCompas=false : KORTxyz.settings.followCompas=true;localStorage.setItem('followCompas',KORTxyz.settings.followCompas);">
+    <div class="slider"></div>
   </label>
-  <h2 style="padding-left:30px">Følg compas</h2>
+  <h4 style="padding-left:30px">Følg compas</h4>
 </div>
 
 <div id="container">
   <label class="switch">
-    <input type="checkbox" id="dummySwitch">
-    <div class="slider round"></div>
+    <input type="checkbox" id="useWebGL" onclick="useWebGL()">
+    <div class="slider"></div>
   </label>
-  <h2 style="padding-left:30px">Dummy Switch</h2>
+  <h4 style="padding-left:30px">Brug WebGL</h4>
 </div>
+
+
+<!-- logic -->
+<script>
+this.on('mount', function() {
+  document.getElementById("Foelgcompas").checked = KORTxyz.settings.followCompas;
+  document.getElementById("useWebGL").checked = KORTxyz.settings.useWebGL;
+})
+
+ useWebGL = function(){
+    KORTxyz.settings.useWebGL? KORTxyz.settings.useWebGL=false : KORTxyz.settings.useWebGL=true;
+    localStorage.setItem('useWebGL',KORTxyz.settings.useWebGL);
+    iziToast.show({
+      icon: 'material-icons',
+      iconText: 'priority_high',
+      message: 'Kræver en genindlæsning for at træde i kræft'
+    }); 
+  }
+</script>
+
 
   <!-- style -->
 <style>
@@ -42,8 +63,8 @@ settingsbar.show {
 .switch {
   position: relative;
   display: inline-block;
-  width: 60px;
-  height: 34px;
+  width: 34px;
+  height: 20px;
 }
 
 /* Hide default HTML checkbox */
@@ -65,8 +86,8 @@ settingsbar.show {
 .slider:before {
   position: absolute;
   content: "";
-  height: 26px;
-  width: 26px;
+  height: 13px;
+  width: 13px;
   left: 4px;
   bottom: 4px;
   background-color: white;
@@ -83,19 +104,11 @@ input:focus + .slider {
 }
 
 input:checked + .slider:before {
-  -webkit-transform: translateX(26px);
-  -ms-transform: translateX(26px);
-  transform: translateX(26px);
+  -webkit-transform: translateX(13px);
+  -ms-transform: translateX(13px);
+  transform: translateX(13px);
 }
 
-/* Rounded sliders */
-.slider.round {
-  border-radius: 34px;
-}
-
-.slider.round:before {
-  border-radius: 50%;
-}
 
 
 #container {
@@ -112,9 +125,5 @@ label {
 }
   </style>
 
-  <!-- logic -->
-  <script>
-
-  </script>
 
 </settingsbar>
