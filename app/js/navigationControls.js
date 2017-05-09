@@ -66,11 +66,11 @@ gps = function(el){
 }
 
 luftfoto = function(el){
-	if(el.classList == ""){
-		addLuftfoto()
-		el.classList = "show";
+	if(el.classList.contains("show")){
+		removeLuftfoto();
+		el.classList.remove("show");
 	}else{
-		removeLuftfoto()
-		el.classList = "";
+		addLuftfoto();
+		el.classList.add("show");
 	}
-}
+} ;

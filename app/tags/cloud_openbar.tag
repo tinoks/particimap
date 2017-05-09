@@ -2,7 +2,7 @@
 
   <!-- layout -->
 
-<div each={ KORTxyz.sources} class="card" id={name} onclick="fetchData(this.id)">
+<div each={ KORTxyz.sources} class="card" id={name} onclick="fetchData(this.id,'&propertyName=kat_navn,svar,sync,geom')">
   <div class="container">
     <h4><b>{title}</b></h4> 
     <p>{abstract}</p> 
@@ -11,13 +11,12 @@
 
   <!-- logic -->
   <script>
-    fetchData = function(name){
+    fetchData = function(name,limits){
         var xmlhttp = new XMLHttpRequest();
-
         xmlhttp.onreadystatechange = function() {
             if (xmlhttp.readyState == XMLHttpRequest.DONE ) {
                if (xmlhttp.status == 200) {
-                   KORTxyz.data = JSON.parse(xmlhttp.responseText).features.map(function(e) {obj=e.properties; obj["geom"] = e.geometry; return obj});
+                   KORTxyz.data = JSON.parse(xmlhttp.responseText).features.map(function(e) {obj=e.properties; obj["id"] = e.id; obj["geom"] = e.geometry; return obj});
                    KORTxyz.data.update = function(svar,id){
 
                    }
@@ -53,7 +52,8 @@
         xmlhttp.open("GET", 
           config.server+
           "service=WFS&version=1.0.0&request=GetFeature&typeName="+name+
-          "&maxFeatures=500&outputFormat=application%2Fjson&srsName=EPSG:4326",
+          "&maxFeatures=2000&outputFormat=application%2Fjson&srsName=EPSG:4326"+
+           limits,
            true, KORTxyz.user.name,KORTxyz.user.pw);
         xmlhttp.send();
     }

@@ -2,7 +2,7 @@ riot = riot;
 KORTxyz = {
 	settings: {
 		followCompas: JSON.parse(localStorage.getItem('followCompas')),
-    useWebGL: JSON.parse(localStorage.getItem('useWebGL'))
+    useWebGL: JSON.parse(localStorage.getItem('useWebGL')) == null ? true : JSON.parse(localStorage.getItem('useWebGL'))
 	},
   user:{
     name: localStorage.getItem('name'),
@@ -56,7 +56,7 @@ require('./js/dataControls.js');
 require('./js/bottomControls.js');
 
 
-
+   
 
 
 // Detect to use Leaflet or Mapbox based on webGL support (CITRIX)
@@ -91,9 +91,13 @@ alasql("CREATE INDEXEDDB DATABASE IF NOT EXISTS KORTxyz; \
         USE KORTxyz; \
         CREATE TABLE IF NOT EXISTS data; \
         SELECT * FROM data; \
+        CREATE TABLE IF NOT EXISTS route; \
+        SELECT * FROM route;\
         CREATE TABLE IF NOT EXISTS sources; \
-        SELECT * FROM sources", function(e){
+        SELECT * FROM sources;", function(e){
           KORTxyz.data = e[4];
           addData();
-          KORTxyz.sources = e[6];
+          KORTxyz.route = e[6];
+          addRoute();
+          KORTxyz.sources = e[8];
         });
