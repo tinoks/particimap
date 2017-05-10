@@ -2,7 +2,7 @@
 
   <!-- layout -->
 
-<div each={ KORTxyz.sources} class="card" id={name} onclick="fetchData(this.id,'&propertyName=kat_navn,svar,sync,geom')">
+<div each={KORTxyz.sources} class="card" id={name} onclick="fetchData(this.id,'&propertyName=kat_navn,svar,sync,geom')">
   <div class="container">
     <h4><b>{title}</b></h4> 
     <p>{abstract}</p> 

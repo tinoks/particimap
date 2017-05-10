@@ -1,10 +1,9 @@
 table = function(el){
 
-    if(document.getElementsByTagName("tablebar").length == 1){
+  if(document.getElementsByTagName("tablebar").length == 1){
     document.getElementsByTagName("tablebar")[0].classList.toggle("show")
     el.classList.toggle("show");
   } else {
-    
     require('../tags/tablebar.tag');
     document.getElementById('map').appendChild(document.createElement("tablebar"));
     el.classList.toggle("show");
@@ -23,7 +22,6 @@ table = function(el){
       }
     )
   }
-
 }
 
 cloud_open = function(el){
@@ -36,10 +34,8 @@ cloud_open = function(el){
     riot.mount('cloud_openbar');
     Ps.initialize(document.getElementsByTagName("cloud_openbar")[0]);
     document.getElementsByTagName("cloud_openbar")[0].classList.toggle("show");
-
     el.classList.toggle("show");
   }
-
 }
 
 

@@ -42,7 +42,7 @@
       font-size: 10px;
     }
 
-    tbody tr:hover { 
+    tbody tr:hover {
       background-color: lightgrey;
     }
 
