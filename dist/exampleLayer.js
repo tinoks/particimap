@@ -1,43 +1,55 @@
 dataConfig = {
-  Polygon: {
-    'fill-color': '#088',
-    'fill-opacity': 0.6
+  Point: {
+    'color': '#088',
+    'opacity': 0.6
   },
 	LineString:{
-    'fill-color': '#088',
-    'fill-opacity': 0.6
+      'line-color': 'grey',
+      'line-opacity': 0.8,
+      'line-width': 2
   },
   Polygon: {
-    'fill-color': '#088',
+    'fill-color': {
+                "property": "svar",
+                "type": "categorical",
+                "default": "lightgrey",
+                "stops": [
+                    ['JA', 'green'],
+                    ['NEJ', 'red']
+                    ]
+            },
     'fill-opacity': 0.6
   },
   popup:  function(f){
-    return  '<h2>'+f.properties.kat_navn+'</h2>'+
-            '<button onclick="dataConfig.wfsT(this)" id="JA '+f.properties.id+'" style="background-color:green;font-family:helvetica;border:0;width:50%;height:32px;">  JA  </button>'+
-            '<button onclick="dataConfig.wfsT(this)" id="NEJ '+f.properties.id+'" style="background-color:red;font-family:helvetica;border:0;width:50%;height:32px;">  NEJ  </button>'   
+    return  '<h2>'+f.properties.AfgNavn+'</h2>'+
+            '<button onclick="dataConfig.wfsT(this)" id="JA '+f.properties.EjerNr+'" style="background-color:green;font-family:helvetica;border:0;width:50%;height:32px;">  JA  </button>'+
+            '<button onclick="dataConfig.wfsT(this)" id="NEJ '+f.properties.EjerNr+'" style="background-color:red;font-family:helvetica;border:0;width:50%;height:32px;">  NEJ  </button>'   
   },
   wfsT: function(elem){
-    console.log(elem.id.split(" "));
-    console.log();
+    dataConfig.updateData(elem.id.split(" ")[0],elem.id.split(" ")[1])
   },
-  updateData: function(id,svar){
-  alasql("UPDATE data SET svar= ? WHERE gid= ?", [svar, id]);
-  KORTxyz.data.filter(e => e.gid==id)[0].svar = svar;
-  updatedData = {"type": "FeatureCollection","features": KORTxyz.data.map(function(obj) {
-          returndata = {properties:{}};
-           Object.keys(obj).map(function(objectKey, index) {
-            if(objectKey != "geom"){ 
-            returndata.properties[objectKey] = obj[objectKey];
-            }else{ 
-            returndata.geometry = obj[objectKey]; 
-            }
-          });
-          return returndata;
-          })
-        };
-  map.getSource('data').setData(updatedData);
-}
-
+  updateData: function(value,id){
+	  alasql(["UPDATE data SET svar='"+ value +"' WHERE EjerNr= "+id]).then(
+      alasql("Select * from data",
+        function(e){
+          var updatedData = {"type": "FeatureCollection","features": e.map(function(obj) {
+                  returndata = {properties:{}};
+                   Object.keys(obj).map(function(objectKey, index) {
+                    if(objectKey != "geom"){ 
+                    returndata.properties[objectKey] = obj[objectKey];
+                    }else{ 
+                    returndata.geometry = obj[objectKey]; 
+                    }
+                  });
+                  return returndata;
+                  })
+                };
+          map.getSource('data').setData(updatedData);
+          popup.remove();
+        }
+      )
+    )
+	}
 }
   
 

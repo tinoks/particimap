@@ -5,11 +5,11 @@
 <table style="width:100%">
   <thead>
     <tr>
-      <th each="{ name, i in this.data[0] }" onclick={ reorder }>{ i }</th> 
+      <th each="{ name, i in opts.data[0] }" onclick={ reorder }>{ i }</th> 
     </tr>
   </thead>
   <tbody>
-    <tr each={ elem, i in this.data }>
+    <tr each={ elem, i in opts.data }>
       <td  no-reorder each={ d, val in elem} >{ elem[val] }</td>
     </tr>
   </tbody>
@@ -20,7 +20,7 @@
 
     tablebar{
       position: absolute;
-      z-index: 10;
+      z-index: 1000;
       margin: 0 0 0 20; 
       height: 100%;
       width:300px;
@@ -37,33 +37,31 @@
     }
 
     table, th, td {
-        border: 1px solid grey;
-        border-collapse: collapse;
-        font-size: 10px;
+      border: 1px solid grey;
+      border-collapse: collapse;
+      font-size: 10px;
     }
 
     tbody tr:hover { 
-        background-color: lightgrey;
+      background-color: lightgrey;
     }
 
-
+    th{
+      letter-spacing: 1;
+      cursor: pointer;
+    }
   </style>
 
   <!-- logic -->
   <script>
+  this.on('mount',function(){
+    setTimeout(function(){
+     document.getElementsByTagName("tablebar")[0].classList.toggle("show");
+    },1)
+   });
 
-  this.data = KORTxyz.data.map(function(obj) {
-    temp = {};
-      Object.keys(obj).map(function(objectKey, index) {
-      if(objectKey != "geom"){ temp[objectKey] = obj[objectKey] }
-      });
-    return temp;
-  });
-
-
- reorder(e) {
-
-      this.data.sort(function (a, b) {
+   reorder(e) {
+      opts.data.sort(function (a, b) {
         return a[e.item.i] - b[e.item.i];
       });
     }

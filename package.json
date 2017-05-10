@@ -19,6 +19,7 @@
     "desandro-classie": "^1.0.1",
     "izitoast": "^1.1.1",
     "javascript-debounce": "^1.0.0",
+    "leaflet": "^1.0.3",
     "mapbox-gl": "^0.36.0",
     "perfect-scrollbar": "^0.6.16",
     "riot-md-table": "0.0.2",
@@ -30,6 +31,7 @@
     "riot": "^3.4.2",
     "style-loader": "^0.16.1",
     "tag-loader": "^0.3.0",
+    "url-loader": "^0.5.8",
     "webpack": "^2.4.1",
     "webpack-dev-server": "^2.4.4"
   }

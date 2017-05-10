@@ -74,7 +74,7 @@ addGPS = function(){
 
 
   function getBearing(endLong,endLat){
-    start = map.getSource('point')._data.features[0].geometry.coordinates
+    start = map.getSource('point')._data.features[0].geometry.coordinates || [0,0];
 
     startLat = start[1] * (Math.PI / 180);
     startLong = start[0] * (Math.PI / 180);
@@ -120,11 +120,15 @@ removeGPS = function(){
 }
 
 
-addData = function(){
-
- var scriptTag = document.createElement('script');
-    scriptTag.src = "exampleLayer.js";
-    document.body.appendChild(scriptTag);
+addData = function(data){
+   if(typeof scriptTag != "undefined"){
+        document.body.removeChild(scriptTag)
+   }
+   scriptTag = document.createElement('script');
+     scriptTag.src = "exampleLayer.js";
+     scriptTag.async = false;
+     document.body.appendChild(scriptTag);
+     scriptTag.onload = function(){
 
 
   if(!!map.getSource('data')){
@@ -136,8 +140,8 @@ addData = function(){
 
   map.addSource('data', {
       type: 'geojson',
-      data: {"type": "FeatureCollection","features": KORTxyz.data.map(function(obj) {
-                returndata = {properties:{}};
+      data: {"type": "FeatureCollection","features": data.map(function(obj) {
+                returndata = {"type": "Feature", "properties":{}};
                   Object.keys(obj).map(function(objectKey, index) {
                   if(objectKey != "geom"){ returndata.properties[objectKey] = obj[objectKey] }
                 else{ returndata.geometry = obj[objectKey]; }
@@ -162,7 +166,7 @@ addData = function(){
         'type': 'line',
         'source': 'data',
         'layout': {},
-        'paint': {
+        'paint': dataConfig.LineString || {
             'line-color': '#088',
             'line-opacity': 0.8
         }
@@ -174,42 +178,51 @@ addData = function(){
         'type': 'fill',
         'source': 'data',
         'layout': {},
-        'paint': {
+        'paint': dataConfig.Polygon || {
             'fill-color': '#088',
             'fill-opacity': 0.6
         }
     }, 'dataLineString');
 
     map.on('click', 'dataPolygon', function (e) {
-        console.log(e.features[0].properties)
-        new mapboxgl.Popup({closeButton:false})
+        popup = new mapboxgl.Popup({closeButton:false})
             .setLngLat(e.lngLat)
             .setHTML(
-              typeof dataConfig != "undefined" ? dataConfig.popup(e.features[0]) : Object.entries(e.features[0].properties).map(e => {return '<b>'+e[0]+'</b> '+e[1]+'<br>'}).join('')
+              typeof dataConfig.popup != "undefined" ? dataConfig.popup(e.features[0]) : Object.entries(e.features[0].properties).map(e => {return '<b>'+e[0]+'</b> '+e[1]+'<br>'}).join('')
             )
             .addTo(map);
     });
+}
+}
+
+// *** TODO *** ///
+updateData = function(){
+
 
 }
 
-
 addRoute = function(data){
+  if(typeof map.getSource('route') != "undefined"){
+    map.removeLayer('routeLines');
+    map.removeSource('route');
+  }
+
  map.addSource('route', {
       type: 'geojson',
-      data: KORTxyz.route.trips[0].geometry
+      data: data[0].geometry
     });
 
-   map.addLayer({
-        'id': 'routeLines',
-        'type': 'line',
-        'source': 'route',
-        'layout': {},
-        'paint': {
-            'line-color': 'blue',
-            'line-opacity': 0.5,
-			'line-width': 5,
-        }
-    }, 'waterway-label'); 
+ map.addLayer({
+      'id': 'routeLines',
+      'type': 'line',
+      'source': 'route',
+      'layout': {},
+      'paint': {
+          'line-color': 'blue',
+          'line-opacity': 0.5,
+		      'line-width': 5,
+      }
+  }, 'waterway-label'); 
 }
 
 addLuftfoto = function(){

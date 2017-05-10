@@ -13,10 +13,12 @@ module.exports = {
     })
   ],
   module: {
-    noParse:[/alasql/,/riot-md-table/],
+    noParse:[/alasql/],
     rules: [
       { test: /\.tag$/, loader: 'tag-loader', query: {compact: 'true'},  exclude: /node_modules/},
-      { test: /\.css$/, use: [ 'style-loader', 'css-loader' ] }
+      { test: /\.css$/, use: [ 'style-loader', 'css-loader' ] },
+      { test: /\.png$/, loader: 'url-loader', query: { mimetype: 'image/png' } }
+
     ]
   },
   devServer: {

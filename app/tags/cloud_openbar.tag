@@ -16,14 +16,12 @@
         xmlhttp.onreadystatechange = function() {
             if (xmlhttp.readyState == XMLHttpRequest.DONE ) {
                if (xmlhttp.status == 200) {
-                   KORTxyz.data = JSON.parse(xmlhttp.responseText).features.map(function(e) {obj=e.properties; obj["id"] = e.id; obj["geom"] = e.geometry; return obj});
-                   KORTxyz.data.update = function(svar,id){
-
-                   }
-                   addData();
+                  var response = JSON.parse(xmlhttp.responseText).features.map(function(e) {obj=e.properties; obj["id"] = e.id; obj["geom"] = e.geometry; return obj});
+     
+                  addData(response);
                   alasql("DROP TABLE IF EXISTS data; \
                           CREATE TABLE data; \
-                          SELECT * INTO data FROM ?", [KORTxyz.data], 
+                          SELECT * INTO data FROM ?", [response], 
                           function(){
                               iziToast.show({
                                 icon: 'material-icons',
@@ -65,7 +63,7 @@
 
 cloud_openbar{
   position: absolute;
-  z-index: 10;
+  z-index: 1000;
   margin: 0 0 0 20; 
   height: calc(100% - 40px);
   height: -moz-calc(100% - 40px);

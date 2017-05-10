@@ -7,17 +7,26 @@ table = function(el){
     
     require('../tags/tablebar.tag');
     document.getElementById('map').appendChild(document.createElement("tablebar"));
-    riot.mount('tablebar');
-    Ps.initialize(document.getElementsByTagName("tablebar")[0]);
-    document.getElementsByTagName("tablebar")[0].classList.toggle("show");
-
     el.classList.toggle("show");
+    alasql(["select * from data"]).then(
+      function(res){
+        var data = res[0].map(
+          function(obj) {
+            temp = {};
+              Object.keys(obj).map(function(objectKey, index) {
+                if(objectKey != "geom"){ temp[objectKey] = obj[objectKey] }
+              });
+            return temp;
+        });
+        riot.mount('tablebar',{data:data});
+        Ps.initialize(document.getElementsByTagName("tablebar")[0]);
+      }
+    )
   }
 
 }
 
 cloud_open = function(el){
-
   if(document.getElementsByTagName("cloud_openbar").length == 1){
     document.getElementsByTagName("cloud_openbar")[0].classList.toggle("show")
     el.classList.toggle("show");
@@ -41,15 +50,11 @@ upload = function(){
     xmlhttp.onreadystatechange = function() {
         if (xmlhttp.readyState == XMLHttpRequest.DONE ) {
            if (xmlhttp.status == 200) {
-               KORTxyz.data = JSON.parse(xmlhttp.responseText).features.map(function(e) {obj=e.properties; obj["geom"] = e.geometry; return obj});
-               KORTxyz.data.update = function(svar,id){
-                  
-                  
-               }
-               addData();
+               var response = JSON.parse(xmlhttp.responseText).features.map(function(e) {obj=e.properties; obj["geom"] = e.geometry; return obj});
+               addData(response);
               alasql("DROP TABLE IF EXISTS data; \
                       CREATE TABLE data; \
-                      SELECT * INTO data FROM ?", [KORTxyz.data], 
+                      SELECT * INTO data FROM ?", [response], 
                       function(){
                           iziToast.show({
                             icon: 'material-icons',
@@ -89,18 +94,18 @@ directions = function(){
       xmlhttp.onreadystatechange = function() {
           if (xmlhttp.readyState == XMLHttpRequest.DONE ) {
              if (xmlhttp.status == 200) {
-                 KORTxyz.route = JSON.parse(xmlhttp.responseText);
-                 addRoute();
+                 response = JSON.parse(xmlhttp.responseText).trips;
+                 addRoute(response);
 
                  alasql("DROP TABLE IF EXISTS route; \
                     CREATE TABLE route; \
-                    SELECT * INTO route FROM ?", [KORTxyz.route], 
+                    SELECT * INTO route FROM ?", [response],
                     function(){
                       iziToast.show({
                         icon: 'material-icons',
                         iconText: 'directions',
-                        message: Math.round(KORTxyz.route.trips[0].duration/60/60*100)/100 + ' timer <br>' + 
-                                 Math.round(KORTxyz.route.trips[0].distance/1000*100)/100 + ' km'
+                        message: Math.round(KORTxyz.route[0].duration/60/60*100)/100 + ' timer <br>' + 
+                                 Math.round(KORTxyz.route[0].distance/1000*100)/100 + ' km'
                       });
                     });
              }
@@ -139,17 +144,19 @@ directions = function(){
           var sixSignedArea = 3 * twoTimesSignedArea;
           return [ Math.round(cxTimes6SignedArea / sixSignedArea * 10000)/10000, Math.round(cyTimes6SignedArea / sixSignedArea * 10000)/10000];       
       }
+      alasql("SELECT geom FROM data;",function(data){
+        var coordinates = data.map(function(obj){
+            return getCentroid2(obj.geom.coordinates[0][0])[0] +","+ getCentroid2(obj.geom.coordinates[0][0])[1];
+        }).join(";")
 
-      var coordinates = KORTxyz.data.map(function(obj){
-          return getCentroid2(obj.geom.coordinates[0][0])[0] +","+ getCentroid2(obj.geom.coordinates[0][0])[1];
-      }).join(";")
+        xmlhttp.open("GET", "http://80.241.215.222:5000/trip/v1/driving/"+coordinates+"?geometries=geojson&steps=false&overview=full", true);
+        xmlhttp.send();
+        iziToast.show({
+          icon: 'material-icons',
+          iconText: 'directions',
+          message: 'Ruteberegning imellem '+ coordinates.length +' punkter er kaldt'
+        });
+      })
 
-      xmlhttp.open("GET", "http://80.241.215.222:5000/trip/v1/driving/"+coordinates+"?geometries=geojson&steps=false&overview=full", true);
-      xmlhttp.send();
-      iziToast.show({
-        icon: 'material-icons',
-        iconText: 'directions',
-        message: 'Ruteberegning imellem '+ coordinates.length +' punkter er kaldt'
-      });
 
 }
