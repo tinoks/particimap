@@ -7,6 +7,11 @@ KORTxyz = {
   user:{
     name: localStorage.getItem('name'),
     pw: localStorage.getItem('pw')
+  },
+  GPS:{
+    lng: 0,
+    lat: 0,
+    time: 0
   }
 };
 

@@ -3865,11 +3865,10 @@ help = function(el){
 
 /* WEBPACK VAR INJECTION */(function(riot) {table = function(el){
 
-    if(document.getElementsByTagName("tablebar").length == 1){
+  if(document.getElementsByTagName("tablebar").length == 1){
     document.getElementsByTagName("tablebar")[0].classList.toggle("show")
     el.classList.toggle("show");
   } else {
-    
     __webpack_require__(47);
     document.getElementById('map').appendChild(document.createElement("tablebar"));
     el.classList.toggle("show");
@@ -3888,7 +3887,6 @@ help = function(el){
       }
     )
   }
-
 }
 
 cloud_open = function(el){
@@ -3901,10 +3899,8 @@ cloud_open = function(el){
     riot.mount('cloud_openbar');
     Ps.initialize(document.getElementsByTagName("cloud_openbar")[0]);
     document.getElementsByTagName("cloud_openbar")[0].classList.toggle("show");
-
     el.classList.toggle("show");
   }
-
 }
 
 
@@ -3959,18 +3955,18 @@ directions = function(){
       xmlhttp.onreadystatechange = function() {
           if (xmlhttp.readyState == XMLHttpRequest.DONE ) {
              if (xmlhttp.status == 200) {
-                 KORTxyz.route = JSON.parse(xmlhttp.responseText).trips;
-                 addRoute();
+                 response = JSON.parse(xmlhttp.responseText).trips;
+                 addRoute(response);
 
                  alasql("DROP TABLE IF EXISTS route; \
                     CREATE TABLE route; \
-                    SELECT * INTO route FROM ?", [KORTxyz.route],
+                    SELECT * INTO route FROM ?", [response],
                     function(){
                       iziToast.show({
                         icon: 'material-icons',
                         iconText: 'directions',
-                        message: Math.round(KORTxyz.route[0].duration/60/60*100)/100 + ' timer <br>' + 
-                                 Math.round(KORTxyz.route[0].distance/1000*100)/100 + ' km'
+                        message: Math.round(response[0].duration/60/60*100)/100 + ' timer <br>' + 
+                                 Math.round(response[0].distance/1000*100)/100 + ' km'
                       });
                     });
              }
@@ -4009,18 +4005,20 @@ directions = function(){
           var sixSignedArea = 3 * twoTimesSignedArea;
           return [ Math.round(cxTimes6SignedArea / sixSignedArea * 10000)/10000, Math.round(cyTimes6SignedArea / sixSignedArea * 10000)/10000];       
       }
+      alasql("SELECT geom FROM data;",function(data){
+        var coordinates = data.map(function(obj){
+            return getCentroid2(obj.geom.coordinates[0][0])[0] +","+ getCentroid2(obj.geom.coordinates[0][0])[1];
+        }).join(";")
 
-      var coordinates = KORTxyz.data.map(function(obj){
-          return getCentroid2(obj.geom.coordinates[0][0])[0] +","+ getCentroid2(obj.geom.coordinates[0][0])[1];
-      }).join(";")
+        xmlhttp.open("GET", "http://80.241.215.222:5000/trip/v1/driving/"+coordinates+"?geometries=geojson&steps=false&overview=full", true);
+        xmlhttp.send();
+        iziToast.show({
+          icon: 'material-icons',
+          iconText: 'directions',
+          message: 'Ruteberegning imellem '+ coordinates.length +' punkter er kaldt'
+        });
+      })
 
-      xmlhttp.open("GET", "http://80.241.215.222:5000/trip/v1/driving/"+coordinates+"?geometries=geojson&steps=false&overview=full", true);
-      xmlhttp.send();
-      iziToast.show({
-        icon: 'material-icons',
-        iconText: 'directions',
-        message: 'Ruteberegning imellem '+ coordinates.length +' punkter er kaldt'
-      });
 
 }
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
@@ -4031,10 +4029,12 @@ directions = function(){
 
 
 rotation = function(){
-	if(map.getPitch() == 0){
-	map.easeTo({pitch: 60})
-	} else{
-	map.easeTo({pitch: 0})
+	if(!!(map.pitch)){
+		if(map.getPitch() == 0){
+		map.easeTo({pitch: 60})
+		} else{
+		map.easeTo({pitch: 0})
+		}
 	}
 }
 
@@ -4076,8 +4076,7 @@ gps = function(el){
 		addGPS();
 
 		function success(pos) {
-		  var crd = pos.coords;
-		  updateGPS(crd.longitude,crd.latitude);
+		  updateGPS(pos.coords);
 		}
 
 		function error(err) {
@@ -4114,11 +4113,31 @@ luftfoto = function(el){
 __webpack_require__(25);
 __webpack_require__(42);
 
+
 map = L.map('map',{
 	preferCanvas:true,
 	attributionControl: false, 
 	zoomControl:false
-}).setView([56.3,10.6], 7);
+});
+
+
+var bbox = localStorage.getItem('bbox');
+if(bbox){
+          bbox =bbox.split(";").map(e=>e.split(",").reverse().map(e=>parseFloat(e)))
+        }else{
+          false
+        };
+if(!!(bbox)){map.fitBounds(bbox,{linear:true});}
+else{map.setView([56.3,10.6], 7);}
+
+
+map.on('moveend',function(){
+    bbox = map.getBounds();
+    localStorage.setItem('bbox',
+        [bbox._southWest.lng,bbox._southWest.lat] + ";" + 
+		[bbox._northEast.lng,bbox._northEast.lat]
+    )
+});
 
 map.createPane('labels');
 map.getPane('labels').style.zIndex = 650;
@@ -4134,36 +4153,92 @@ L.tileLayer('https://api.mapbox.com/styles/v1/tinoks/cj23f8dyn007v2sqr576t3vlo/t
 
 
 addGPS = function(){
+	GPSpoint = L.circle([0,0], {radius: 200}).addTo(map);
+	GPSpoint.setStyle({color:'red',fillColor:'red'})
 
 }
 
-updateGPS = function(lng,lat){
-
+updateGPS = function(crd){
+	GPSpoint.setRadius(crd.accuracy);
+    GPSpoint.setLatLng([crd.latitude,crd.longitude]);
+    map.panTo([crd.latitude,crd.longitude]);
 }
 
 removeGPS = function(){
+    map.removeLayer(GPSpoint);
 
 }
 
 
 addData = function(data){
+	// Removes Layer if exists;
 
-    dataLayer = L.geoJSON({"type": "FeatureCollection","features": data.map(function(obj) {
-                returndata = {"type": "Feature", "properties":{}};
-                  Object.keys(obj).map(function(objectKey, index) {
-                  if(objectKey != "geom"){ returndata.properties[objectKey] = obj[objectKey] }
-                else{ returndata.geometry = obj[objectKey]; }
-                  });
-                return returndata;
-              })},{
+	// Load Configuration Data		
+   if(typeof scriptTag != "undefined"){
+        document.body.removeChild(scriptTag)
+   }
+   scriptTag = document.createElement('script');
+   scriptTag.src = "exampleLayer.js";
+   scriptTag.async = false;
+   document.body.appendChild(scriptTag);
+   scriptTag.onload = function(){
+		if(typeof dataLayer != "undefined"){map.removeLayer(dataLayer)}
 
-    }).addTo(map);
+   		// DATA
+		dataLayer = L.geoJSON({"type": "FeatureCollection","features": data.map(function(obj) {
+		            returndata = {"type": "Feature", "properties":{}};
+		              Object.keys(obj).map(function(objectKey, index) {
+		              if(objectKey != "geom"){ returndata.properties[objectKey] = obj[objectKey] }
+		            else{ returndata.geometry = obj[objectKey]; }
+		              });
+		            return returndata;
+		          })}).addTo(map);
+
+		// STYLE
+		if(typeof dataConfig.Polygon != "undefined"){
+			dataLayer.setStyle({
+				fillOpacity: dataConfig.Polygon["fill-opacity"] || 0.6,
+
+				color: dataConfig.LineString["line-color"] || "#"+((1<<24)*Math.random()|0).toString(16),
+				opacity: dataConfig.LineString["line-opacity"] || 0.8,
+     			weight: dataConfig.LineString["line-width"] || 2
+			})
+
+			if(typeof dataConfig.Polygon["fill-color"] != "object"){
+				dataLayer.setStyle({
+					fillOpacity: dataConfig.Polygon["fill-color"] || "#"+((1<<24)*Math.random()|0).toString(16)
+				})
+			}else{
+				function style(feature){
+					config = dataConfig.Polygon["fill-color"];
+					prop = config.property;
+					match = config.stops.filter(e => e[0] == feature.properties[prop])[0];
+					console.log(match);
+					return {
+					  fillColor: typeof match != "undefined" ? match[1] : config.default
+					}
+				}
+				dataLayer.setStyle(style)
+			}
+
+		}
+
+		//POPUP
+		dataLayer.on("click",function(e){
+		   popup = L.popup()
+		    .setLatLng(e.latlng)
+		    .setContent(dataConfig.popup(e.layer.feature))
+		    .openOn(map);
+		    popup.feature = e;
+
+		})
+   }
 }
 
 // *** TODO *** ///
-updateData = function(){
-
-
+updateData = function(e){
+	addData(e);
+	popup.feature.layer.setStyle({fillColor:"green"})
 }
 
 addRoute = function(data){
@@ -4196,15 +4271,31 @@ mapboxgl.accessToken = 'pk.eyJ1IjoidGlub2tzIiwiYSI6Ikp4OE0yWjQifQ.8ShzvCuk6zpjf9
 map = new mapboxgl.Map({
     container: 'map', // container id
     style: 'mapbox://styles/tinoks/cj1mhszqc002a2slpp5701ani', //stylesheet location
-    center: [10.6, 56.3], // starting position
-    zoom: 7,
     maxZoom: 18,
     attributionControl: false});
+
+map.on('moveend',function(){
+    var bbox = map.getBounds()
+    localStorage.setItem('bbox',
+        [bbox._sw.lng, bbox._sw.lat] +";"+
+        [bbox._ne.lng, bbox._ne.lat]
+    )
+});
+
+
+var bbox = localStorage.getItem('bbox');
+if(bbox){
+          bbox =bbox.split(";").map(e=>e.split(",").map(e=>parseFloat(e)))
+        }else{
+          false
+        };
+if(!!(bbox)){map.fitBounds(bbox,{linear:true});}
 
 //document.getElementsByClassName("mapboxgl-control-container")[0].remove()
 
 map.addControl(new mapboxgl.ScaleControl(),'bottom-right');
 document.getElementsByClassName('mapboxgl-ctrl-scale')[0].style["border-color"] = "#4f4d56"
+
 
 addGPS = function(){
   if(map.getSource('point') == undefined) {
@@ -4264,7 +4355,7 @@ addGPS = function(){
 
 
 
-  function getBearing(endLong,endLat){
+  getBearing = function(endLong,endLat){
     start = map.getSource('point')._data.features[0].geometry.coordinates || [0,0];
 
     startLat = start[1] * (Math.PI / 180);
@@ -4288,7 +4379,7 @@ addGPS = function(){
 
 }
 
-updateGPS = function(lng,lat){
+updateGPS = function(crd){
   map.getSource('point').setData({
        "type": "FeatureCollection",
        "features": [{
@@ -4296,13 +4387,13 @@ updateGPS = function(lng,lat){
            "properties": {},
            "geometry": {
                "type": "Point",
-               "coordinates": [lng,lat] 
+               "coordinates": [crd.longitude,crd.latitude] 
            }
        }]
   });
   map.easeTo({
     bearing: KORTxyz.settings.followCompas ? crd.heading || getBearing(crd.longitude,crd.latitude) || 0 : 0,
-    center: [lng,lat]
+    center: [crd.longitude,crd.latitude]
   })
 }
 
@@ -4387,9 +4478,20 @@ addData = function(data){
 }
 
 // *** TODO *** ///
-updateData = function(){
-
-
+updateData = function(e){
+          var updatedData = {"type": "FeatureCollection","features": e.map(function(obj) {
+                  returndata = {properties:{}};
+                   Object.keys(obj).map(function(objectKey, index) {
+                    if(objectKey != "geom"){ 
+                    returndata.properties[objectKey] = obj[objectKey];
+                    }else{ 
+                    returndata.geometry = obj[objectKey]; 
+                    }
+                  });
+                  return returndata;
+                  })
+                };
+          map.getSource('data').setData(updatedData);
 }
 
 addRoute = function(data){

@@ -26,26 +26,14 @@ dataConfig = {
             '<button onclick="dataConfig.wfsT(this)" id="NEJ '+f.properties.EjerNr+'" style="background-color:red;font-family:helvetica;border:0;width:50%;height:32px;">  NEJ  </button>'   
   },
   wfsT: function(elem){
+    
     dataConfig.updateData(elem.id.split(" ")[0],elem.id.split(" ")[1])
   },
   updateData: function(value,id){
 	  alasql(["UPDATE data SET svar='"+ value +"' WHERE EjerNr= "+id]).then(
-      alasql("Select * from data",
-        function(e){
-          var updatedData = {"type": "FeatureCollection","features": e.map(function(obj) {
-                  returndata = {properties:{}};
-                   Object.keys(obj).map(function(objectKey, index) {
-                    if(objectKey != "geom"){ 
-                    returndata.properties[objectKey] = obj[objectKey];
-                    }else{ 
-                    returndata.geometry = obj[objectKey]; 
-                    }
-                  });
-                  return returndata;
-                  })
-                };
-          map.getSource('data').setData(updatedData);
-          popup.remove();
+      alasql("Select * from data",function(e){
+        updateData(e);
+        popup.remove();
         }
       )
     )

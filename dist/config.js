@@ -1,4 +1,4 @@
 config = {
-	server: 'http://vpctinkas/geoserver/ows?' //'http://jordbrugsanalyser.dk/geoserver/wfs?' 
-
+	server:'http://jordbrugsanalyser.dk/geoserver/ows?'
+//	server:'http://vpctinkas/geoserver/ows?' 
 }

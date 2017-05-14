@@ -11,7 +11,7 @@
 
   <!-- logic -->
   <script>
-    fetchData = function(name,limits){
+    fetchData = function(name){
         var xmlhttp = new XMLHttpRequest();
         xmlhttp.onreadystatechange = function() {
             if (xmlhttp.readyState == XMLHttpRequest.DONE ) {
@@ -50,8 +50,7 @@
         xmlhttp.open("GET", 
           config.server+
           "service=WFS&version=1.0.0&request=GetFeature&typeName="+name+
-          "&maxFeatures=2000&outputFormat=application%2Fjson&srsName=EPSG:4326"+
-           limits,
+          "&maxFeatures=2000&outputFormat=application%2Fjson&srsName=EPSG:4326",
            true, KORTxyz.user.name,KORTxyz.user.pw);
         xmlhttp.send();
     }

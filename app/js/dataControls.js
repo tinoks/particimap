@@ -3,6 +3,9 @@ table = function(el){
   if(document.getElementsByTagName("tablebar").length == 1){
     document.getElementsByTagName("tablebar")[0].classList.toggle("show")
     el.classList.toggle("show");
+    setTimeout(function(){
+      document.getElementById('map').removeChild(document.getElementsByTagName("tablebar")[0])
+    },300)
   } else {
     require('../tags/tablebar.tag');
     document.getElementById('map').appendChild(document.createElement("tablebar"));
@@ -24,10 +27,15 @@ table = function(el){
   }
 }
 
+
+
 cloud_open = function(el){
   if(document.getElementsByTagName("cloud_openbar").length == 1){
     document.getElementsByTagName("cloud_openbar")[0].classList.toggle("show")
     el.classList.toggle("show");
+    setTimeout(function(){
+      document.getElementById('map').removeChild(document.getElementsByTagName("cloud_openbar")[0])
+    },300)
   } else {
     require('../tags/cloud_openbar.tag');
     document.getElementById('map').appendChild(document.createElement("cloud_openbar"));
@@ -84,6 +92,7 @@ upload = function(){
 }
 
 
+
 directions = function(){
   var xmlhttp = new XMLHttpRequest();
 
@@ -100,8 +109,8 @@ directions = function(){
                       iziToast.show({
                         icon: 'material-icons',
                         iconText: 'directions',
-                        message: Math.round(KORTxyz.route[0].duration/60/60*100)/100 + ' timer <br>' + 
-                                 Math.round(KORTxyz.route[0].distance/1000*100)/100 + ' km'
+                        message: Math.round(response[0].duration/60/60*100)/100 + ' timer <br>' + 
+                                 Math.round(response[0].distance/1000*100)/100 + ' km'
                       });
                     });
              }
@@ -143,9 +152,9 @@ directions = function(){
       alasql("SELECT geom FROM data;",function(data){
         var coordinates = data.map(function(obj){
             return getCentroid2(obj.geom.coordinates[0][0])[0] +","+ getCentroid2(obj.geom.coordinates[0][0])[1];
-        }).join(";")
-
-        xmlhttp.open("GET", "http://80.241.215.222:5000/trip/v1/driving/"+coordinates+"?geometries=geojson&steps=false&overview=full", true);
+        })
+        console.log(coordinates);
+        xmlhttp.open("GET", "http://80.241.215.222:5000/trip/v1/driving/"+coordinates.join(";")+"?geometries=geojson&steps=false&overview=full", true);
         xmlhttp.send();
         iziToast.show({
           icon: 'material-icons',

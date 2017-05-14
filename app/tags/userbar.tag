@@ -25,8 +25,8 @@
   <script>
 
   
-  this.noUser = !(!!KORTxyz.user);
-  this.buttontext = !(!!KORTxyz.user) ? "Login" : "Logout";
+  this.noUser = !(!!KORTxyz.user.name);
+  this.buttontext = !(!!KORTxyz.user.name) ? "Login" : "Logout";
 
   this.loading = false;
 
@@ -44,19 +44,22 @@
 
     if(this.buttontext == "Login"){
       if(this.refs.name.value.length>0){
-        this.loading = true;
+        
+        that = this;
 
+        this.loading = true;
         name = this.refs.name.value;
         pw = this.refs.pw.value;
         
         xmlHttp=new XMLHttpRequest();
         xmlHttp.mozBackgroundRequest = true;
-        xmlHttp.onload = () =>{
+
+        xmlHttp.onloadend = () =>{
           this.loading = false;
-          this.noUser = !(!!KORTxyz.user);
-          this.buttontext = !(!!KORTxyz.user) ? "Login" : "Logout";
+          this.noUser = !(!!KORTxyz.user.name);
+          this.buttontext = !(!!KORTxyz.user.name) ? "Login" : "Logout";
           this.update();
-        } 
+        }
 
         xmlHttp.open("GET",config.server+
                       "service=wfs&version=1.1.0&request=GetCapabilities",
@@ -70,6 +73,7 @@
               localStorage.setItem('name',name);
               localStorage.setItem('pw',pw);
               KORTxyz.sources = [];
+
               xmlDoc = xmlHttp.responseXML.getElementsByTagName("FeatureType");
               for (var i = 0; i < xmlDoc.length; i++) {
                   KORTxyz.sources.push({
@@ -81,28 +85,37 @@
               alasql("DROP TABLE IF EXISTS sources; \
                       CREATE TABLE sources; \
                       SELECT * INTO sources FROM ?", [KORTxyz.sources],function(){});
-
           }
           else if(xmlHttp.readyState == 4 && xmlHttp.status != 200){
+
             iziToast.error({
               icon: 'material-icons',
               iconText: 'error',
                 message: 'Forkert Brugernavn/password'
-            }); 
-            return false   
+            });
+
           }
         }; 
-      }else{
+      }
+      // NO name in the field
+      else{
         iziToast.error({
           icon: 'material-icons',
           iconText: 'error',
             message: 'Skriv et brugernavn'
         });
       }
-    } else {
+    }
+    //LOGOUT
+    else {
       delete KORTxyz.user;
+      localStorage.removeItem('name');
+      localStorage.removeItem('pw');
       this.noUser = !(!!KORTxyz.user);
       this.buttontext = !(!!KORTxyz.user) ? "Login" : "Logout";
+      
+      KORTxyz.sources = [];
+      alasql("DROP TABLE IF EXISTS sources;")
     }
 
    }

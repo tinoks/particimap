@@ -1,9 +1,11 @@
 
 rotation = function(){
-	if(map.getPitch() == 0){
-	map.easeTo({pitch: 60})
-	} else{
-	map.easeTo({pitch: 0})
+	if(!!(map.getPitch)){
+		if(map.getPitch() == 0){
+		map.easeTo({pitch: 60})
+		} else{
+		map.easeTo({pitch: 0})
+		}
 	}
 }
 
@@ -45,8 +47,12 @@ gps = function(el){
 		addGPS();
 
 		function success(pos) {
-		  var crd = pos.coords;
-		  updateGPS(crd.longitude,crd.latitude);
+		  KORTxyz.GPS = {
+		  	lng: pos.coords.longitude,
+		  	lat: pos.coords.latitude,
+		  	time: pos.timestamp
+		  };
+		  updateGPS(pos.coords);
 		}
 
 		function error(err) {

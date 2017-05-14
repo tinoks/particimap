@@ -9,7 +9,7 @@
     </tr>
   </thead>
   <tbody>
-    <tr each={ elem, i in opts.data }>
+    <tr each={ elem, i in opts.data } onclick="alert('test')">
       <td  no-reorder each={ d, val in elem} >{ elem[val] }</td>
     </tr>
   </tbody>

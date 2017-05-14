@@ -5,15 +5,31 @@ mapboxgl.accessToken = 'pk.eyJ1IjoidGlub2tzIiwiYSI6Ikp4OE0yWjQifQ.8ShzvCuk6zpjf9
 map = new mapboxgl.Map({
     container: 'map', // container id
     style: 'mapbox://styles/tinoks/cj1mhszqc002a2slpp5701ani', //stylesheet location
-    center: [10.6, 56.3], // starting position
-    zoom: 7,
     maxZoom: 18,
     attributionControl: false});
+
+map.on('moveend',function(){
+    var bbox = map.getBounds()
+    localStorage.setItem('bbox',
+        [bbox._sw.lng, bbox._sw.lat] +";"+
+        [bbox._ne.lng, bbox._ne.lat]
+    )
+});
+
+
+var bbox = localStorage.getItem('bbox');
+if(bbox){
+          bbox =bbox.split(";").map(e=>e.split(",").map(e=>parseFloat(e)))
+        }else{
+          false
+        };
+if(!!(bbox)){map.fitBounds(bbox,{linear:true});}
 
 //document.getElementsByClassName("mapboxgl-control-container")[0].remove()
 
 map.addControl(new mapboxgl.ScaleControl(),'bottom-right');
 document.getElementsByClassName('mapboxgl-ctrl-scale')[0].style["border-color"] = "#4f4d56"
+
 
 addGPS = function(){
   if(map.getSource('point') == undefined) {
@@ -71,9 +87,7 @@ addGPS = function(){
       }
   });
 
-
-
-  function getBearing(endLong,endLat){
+  getBearing = function(endLong,endLat){
     start = map.getSource('point')._data.features[0].geometry.coordinates || [0,0];
 
     startLat = start[1] * (Math.PI / 180);
@@ -97,7 +111,9 @@ addGPS = function(){
 
 }
 
-updateGPS = function(lng,lat){
+
+
+updateGPS = function(crd){
   map.getSource('point').setData({
        "type": "FeatureCollection",
        "features": [{
@@ -105,19 +121,22 @@ updateGPS = function(lng,lat){
            "properties": {},
            "geometry": {
                "type": "Point",
-               "coordinates": [lng,lat] 
+               "coordinates": [crd.longitude,crd.latitude] 
            }
        }]
   });
   map.easeTo({
     bearing: KORTxyz.settings.followCompas ? crd.heading || getBearing(crd.longitude,crd.latitude) || 0 : 0,
-    center: [lng,lat]
+    center: [crd.longitude,crd.latitude]
   })
 }
+
+
 
 removeGPS = function(){
     map.removeLayer('GPSpoint')
 }
+
 
 
 addData = function(data){
@@ -136,7 +155,6 @@ addData = function(data){
     map.removeLayer('dataPolygon'); 
     map.removeSource('data');
   }
-
 
   map.addSource('data', {
       type: 'geojson',
@@ -167,7 +185,7 @@ addData = function(data){
         'source': 'data',
         'layout': {},
         'paint': dataConfig.LineString || {
-            'line-color': '#088',
+            'line-color':  "#"+((1<<24)*Math.random()|0).toString(16),
             'line-opacity': 0.8
         }
     }, 'waterway-label');
@@ -179,7 +197,7 @@ addData = function(data){
         'source': 'data',
         'layout': {},
         'paint': dataConfig.Polygon || {
-            'fill-color': '#088',
+            'fill-color':  "#"+((1<<24)*Math.random()|0).toString(16),
             'fill-opacity': 0.6
         }
     }, 'dataLineString');
@@ -192,13 +210,24 @@ addData = function(data){
             )
             .addTo(map);
     });
-}
+  }
 }
 
 // *** TODO *** ///
-updateData = function(){
-
-
+updateData = function(e){
+          var updatedData = {"type": "FeatureCollection","features": e.map(function(obj) {
+                  returndata = {properties:{}};
+                   Object.keys(obj).map(function(objectKey, index) {
+                    if(objectKey != "geom"){ 
+                    returndata.properties[objectKey] = obj[objectKey];
+                    }else{ 
+                    returndata.geometry = obj[objectKey]; 
+                    }
+                  });
+                  return returndata;
+                  })
+                };
+          map.getSource('data').setData(updatedData);
 }
 
 addRoute = function(data){
@@ -218,8 +247,8 @@ addRoute = function(data){
       'source': 'route',
       'layout': {},
       'paint': {
-          'line-color': 'blue',
-          'line-opacity': 0.5,
+          'line-color': '#4286f4',
+          'line-opacity': 0.7,
 		      'line-width': 5,
       }
   }, 'waterway-label'); 
