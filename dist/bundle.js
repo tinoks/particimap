@@ -3816,6 +3816,9 @@ module.exports = g;
   if(document.getElementsByTagName("userbar").length == 1){
     document.getElementsByTagName("userbar")[0].classList.toggle("show")
     el.classList.toggle("show");
+    setTimeout(function(){
+      document.getElementById('map').removeChild(document.getElementsByTagName("userbar")[0])
+    },300)
   } else {
     __webpack_require__(48);
     document.getElementById('map').appendChild(document.createElement("userbar"));
@@ -3833,6 +3836,9 @@ settings = function(el){
   if(document.getElementsByTagName("settingsbar").length == 1){
     document.getElementsByTagName("settingsbar")[0].classList.toggle("show")
     el.classList.toggle("show");
+    setTimeout(function(){
+      document.getElementById('map').removeChild(document.getElementsByTagName("settingsbar")[0])
+    },300)
   } else {
     __webpack_require__(46);
     document.getElementById('map').appendChild(document.createElement("settingsbar"));
@@ -3847,6 +3853,9 @@ help = function(el){
   if(document.getElementsByTagName("helpbar").length == 1){
     document.getElementsByTagName("helpbar")[0].classList.toggle("show")
     el.classList.toggle("show");
+    setTimeout(function(){
+      document.getElementById('map').removeChild(document.getElementsByTagName("helpbar")[0])
+    },300)
   } else {
     __webpack_require__(45);
     document.getElementById('map').appendChild(document.createElement("helpbar"));
@@ -3868,6 +3877,9 @@ help = function(el){
   if(document.getElementsByTagName("tablebar").length == 1){
     document.getElementsByTagName("tablebar")[0].classList.toggle("show")
     el.classList.toggle("show");
+    setTimeout(function(){
+      document.getElementById('map').removeChild(document.getElementsByTagName("tablebar")[0])
+    },300)
   } else {
     __webpack_require__(47);
     document.getElementById('map').appendChild(document.createElement("tablebar"));
@@ -3889,10 +3901,15 @@ help = function(el){
   }
 }
 
+
+
 cloud_open = function(el){
   if(document.getElementsByTagName("cloud_openbar").length == 1){
     document.getElementsByTagName("cloud_openbar")[0].classList.toggle("show")
     el.classList.toggle("show");
+    setTimeout(function(){
+      document.getElementById('map').removeChild(document.getElementsByTagName("cloud_openbar")[0])
+    },300)
   } else {
     __webpack_require__(44);
     document.getElementById('map').appendChild(document.createElement("cloud_openbar"));
@@ -3947,6 +3964,7 @@ upload = function(){
 
 
 }
+
 
 
 directions = function(){
@@ -4008,9 +4026,9 @@ directions = function(){
       alasql("SELECT geom FROM data;",function(data){
         var coordinates = data.map(function(obj){
             return getCentroid2(obj.geom.coordinates[0][0])[0] +","+ getCentroid2(obj.geom.coordinates[0][0])[1];
-        }).join(";")
-
-        xmlhttp.open("GET", "http://80.241.215.222:5000/trip/v1/driving/"+coordinates+"?geometries=geojson&steps=false&overview=full", true);
+        })
+        console.log(coordinates);
+        xmlhttp.open("GET", "http://80.241.215.222:5000/trip/v1/driving/"+coordinates.join(";")+"?geometries=geojson&steps=false&overview=full", true);
         xmlhttp.send();
         iziToast.show({
           icon: 'material-icons',
@@ -4021,6 +4039,15 @@ directions = function(){
 
 
 }
+
+
+sync = function(elem){
+                  iziToast.show({
+                  icon: 'material-icons',
+                  iconText: 'sync',
+                    message: 'synkronisere.'
+                });
+}
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ }),
@@ -4029,7 +4056,7 @@ directions = function(){
 
 
 rotation = function(){
-	if(!!(map.pitch)){
+	if(!!(map.getPitch)){
 		if(map.getPitch() == 0){
 		map.easeTo({pitch: 60})
 		} else{
@@ -4076,6 +4103,11 @@ gps = function(el){
 		addGPS();
 
 		function success(pos) {
+		  KORTxyz.GPS = {
+		  	lng: pos.coords.longitude,
+		  	lat: pos.coords.latitude,
+		  	time: pos.timestamp
+		  };
 		  updateGPS(pos.coords);
 		}
 
@@ -4213,7 +4245,6 @@ addData = function(data){
 					config = dataConfig.Polygon["fill-color"];
 					prop = config.property;
 					match = config.stops.filter(e => e[0] == feature.properties[prop])[0];
-					console.log(match);
 					return {
 					  fillColor: typeof match != "undefined" ? match[1] : config.default
 					}
@@ -4238,7 +4269,6 @@ addData = function(data){
 // *** TODO *** ///
 updateData = function(e){
 	addData(e);
-	popup.feature.layer.setStyle({fillColor:"green"})
 }
 
 addRoute = function(data){
@@ -4270,7 +4300,7 @@ __webpack_require__(43);
 mapboxgl.accessToken = 'pk.eyJ1IjoidGlub2tzIiwiYSI6Ikp4OE0yWjQifQ.8ShzvCuk6zpjf9n_1pS_fA';
 map = new mapboxgl.Map({
     container: 'map', // container id
-    style: 'mapbox://styles/tinoks/cj1mhszqc002a2slpp5701ani', //stylesheet location
+    style: 'mapbox://styles/tinoks/cj1mhszqc002a2slpp5701ani?optimize=true', //stylesheet location
     maxZoom: 18,
     attributionControl: false});
 
@@ -4353,8 +4383,6 @@ addGPS = function(){
       }
   });
 
-
-
   getBearing = function(endLong,endLat){
     start = map.getSource('point')._data.features[0].geometry.coordinates || [0,0];
 
@@ -4379,6 +4407,8 @@ addGPS = function(){
 
 }
 
+
+
 updateGPS = function(crd){
   map.getSource('point').setData({
        "type": "FeatureCollection",
@@ -4397,9 +4427,12 @@ updateGPS = function(crd){
   })
 }
 
+
+
 removeGPS = function(){
     map.removeLayer('GPSpoint')
 }
+
 
 
 addData = function(data){
@@ -4418,7 +4451,6 @@ addData = function(data){
     map.removeLayer('dataPolygon'); 
     map.removeSource('data');
   }
-
 
   map.addSource('data', {
       type: 'geojson',
@@ -4449,7 +4481,7 @@ addData = function(data){
         'source': 'data',
         'layout': {},
         'paint': dataConfig.LineString || {
-            'line-color': '#088',
+            'line-color':  "#"+((1<<24)*Math.random()|0).toString(16),
             'line-opacity': 0.8
         }
     }, 'waterway-label');
@@ -4461,7 +4493,7 @@ addData = function(data){
         'source': 'data',
         'layout': {},
         'paint': dataConfig.Polygon || {
-            'fill-color': '#088',
+            'fill-color':  "#"+((1<<24)*Math.random()|0).toString(16),
             'fill-opacity': 0.6
         }
     }, 'dataLineString');
@@ -4474,7 +4506,7 @@ addData = function(data){
             )
             .addTo(map);
     });
-}
+  }
 }
 
 // *** TODO *** ///
@@ -4511,8 +4543,8 @@ addRoute = function(data){
       'source': 'route',
       'layout': {},
       'paint': {
-          'line-color': 'blue',
-          'line-opacity': 0.5,
+          'line-color': '#4286f4',
+          'line-opacity': 0.7,
 		      'line-width': 5,
       }
   }, 'waterway-label'); 
@@ -4555,6 +4587,26 @@ addLuftfoto = function(){
 
 removeLuftfoto = function(){
     map.removeLayer('GST');
+}
+
+
+blink = function(data){
+  console.log(data);
+        var coordinates = data.coordinates[0][0];
+
+        // Pass the first coordinates in the LineString to `lngLatBounds` &
+        // wrap each coordinate pair in `extend` to include them in the bounds
+        // result. A variation of this technique could be applied to zooming
+        // to the bounds of multiple Points or Polygon geomteries - it just
+        // requires wrapping all the coordinates with the extend method.
+        var bounds = coordinates.reduce(function(bounds, coord) {
+            return bounds.extend(coord);
+        }, new mapboxgl.LngLatBounds(coordinates[0], coordinates[0]));
+
+
+        map.fitBounds(bounds, {
+          padding: 20
+        });
 }
 
 /***/ }),
@@ -23129,6 +23181,11 @@ KORTxyz = {
   user:{
     name: localStorage.getItem('name'),
     pw: localStorage.getItem('pw')
+  },
+  GPS:{
+    lng: 0,
+    lat: 0,
+    time: 0
   }
 };
 
@@ -38199,7 +38256,7 @@ if(false) {
 var riot = __webpack_require__(1);
 
 riot.tag2('cloud_openbar', '<div each="{KORTxyz.sources}" class="card" id="{name}" onclick="fetchData(this.id,\'&propertyName=kat_navn,svar,sync,geom\')"><div class="container"><h4><b>{title}</b></h4><p>{abstract}</p></div></div>', 'cloud_openbar{ position: absolute; z-index: 1000; margin: 0 0 0 20; height: calc(100% - 40px); height: -moz-calc(100% - 40px); height: -webkit-calc(100% - 40px); width:260px; padding:20px; background: white; right:-300px; transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0px 0px 0px grey; } cloud_openbar.show { right:0; box-shadow: 0px 0px 12px grey; } cloud_openbar .card,[data-is="cloud_openbar"] .card{ box-shadow: 2px 2px 14px 0 rgba(0,0,0,0.2); transition: 0.5s; width: 100%; cursor: pointer; } cloud_openbar .card:hover,[data-is="cloud_openbar"] .card:hover{ box-shadow: 6px 6px 22px 0 rgba(0,0,0,0.2); } cloud_openbar .container,[data-is="cloud_openbar"] .container{ padding: 2px 16px; margin-bottom:10px; }', '', function(opts) {
-    fetchData = function(name,limits){
+    fetchData = function(name){
         var xmlhttp = new XMLHttpRequest();
         xmlhttp.onreadystatechange = function() {
             if (xmlhttp.readyState == XMLHttpRequest.DONE ) {
@@ -38238,8 +38295,7 @@ riot.tag2('cloud_openbar', '<div each="{KORTxyz.sources}" class="card" id="{name
         xmlhttp.open("GET",
           config.server+
           "service=WFS&version=1.0.0&request=GetFeature&typeName="+name+
-          "&maxFeatures=2000&outputFormat=application%2Fjson&srsName=EPSG:4326"+
-           limits,
+          "&maxFeatures=2000&outputFormat=application%2Fjson&srsName=EPSG:4326",
            true, KORTxyz.user.name,KORTxyz.user.pw);
         xmlhttp.send();
     }
@@ -38276,6 +38332,9 @@ riot.tag2('helpbar', '<div each="{data}" id="container"><i class="material-icons
 
     {icon:"directions",
      text:"Beregner den optimale rute mellem markerne."},
+
+    {icon:"sync",
+     text:"Synkronisere redigeringer med serveren."},
 
     {icon:"person",
      text:"Bruger login siden."},
@@ -38317,12 +38376,19 @@ this.on('mount', function() {
 
 var riot = __webpack_require__(1);
 
-riot.tag2('tablebar', '<table style="width:100%"><thead><tr><th each="{name, i in opts.data[0]}" onclick="{reorder}">{i}</th></tr></thead><tbody><tr each="{elem, i in opts.data}"><td no-reorder each="{d, val in elem}">{elem[val]}</td></tr></tbody></table>', 'tablebar{ position: absolute; z-index: 1000; margin: 0 0 0 20; height: 100%; width:300px; padding:0px; background: white; right:-300px; transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0px 0px 0px grey; } tablebar.show { right:0; box-shadow: 0px 0px 12px grey; } tablebar table,[data-is="tablebar"] table,tablebar th,[data-is="tablebar"] th,tablebar td,[data-is="tablebar"] td{ border: 1px solid grey; border-collapse: collapse; font-size: 10px; } tablebar tbody tr:hover,[data-is="tablebar"] tbody tr:hover{ background-color: lightgrey; } tablebar th,[data-is="tablebar"] th{ letter-spacing: 1; cursor: pointer; }', '', function(opts) {
+riot.tag2('tablebar', '<table style="width:100%"><thead><tr><th each="{name, i in opts.data[0]}" onclick="{reorder}">{i}</th></tr></thead><tbody><tr each="{elem, i in opts.data}" onclick="{zoomTo}"><td no-reorder each="{d, val in elem}">{elem[val]}</td></tr></tbody></table>', 'tablebar{ position: absolute; z-index: 1000; margin: 0 0 0 20; height: 100%; width:300px; padding:0px; background: white; right:-300px; transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0px 0px 0px grey; } tablebar.show { right:0; box-shadow: 0px 0px 12px grey; } tablebar table,[data-is="tablebar"] table,tablebar th,[data-is="tablebar"] th,tablebar td,[data-is="tablebar"] td{ border: 1px solid grey; border-collapse: collapse; cursor: pointer; font-size: 10px; } tablebar tbody tr:hover,[data-is="tablebar"] tbody tr:hover{ background-color: lightgrey; } tablebar th,[data-is="tablebar"] th{ letter-spacing: 1; }', '', function(opts) {
   this.on('mount',function(){
     setTimeout(function(){
      document.getElementsByTagName("tablebar")[0].classList.toggle("show");
     },1)
    });
+
+   this.zoomTo = function(e){
+    alasql("select geom from data where id=?",
+            e.item.elem.id,
+            res=>blink(res[0].geom)
+          )
+   }.bind(this)
 
    this.reorder = function(e) {
       opts.data.sort(function (a, b) {
@@ -38341,8 +38407,8 @@ var riot = __webpack_require__(1);
 riot.tag2('userbar', '<div show="{noUser}"><div class="spinnerContainer" show="{loading}"><div class="spinner"><div class="double-bounce1"></div><div class="double-bounce2"></div></div></div><div class="group"><input ref="name" type="text" onblur="isused(this)"><span class="highlight"></span><span class="bar"></span><label>Name</label></div><div class="group"><input ref="pw" type="password" onblur="isused(this)" class="" type="email"><span class="highlight"></span><span class="bar"></span><label>Password</label></div></div><button id="submitButton" type="button" class="button buttonBlue" onclick="{login}">{buttontext} <div class="ripples buttonRipples"><span class="ripplesCircle" style="top: 9.76563px; left: 41.5px;"></span></div></button>', 'userbar{ position: absolute; z-index: 1000; margin: 0 0 0 20; height: calc(100% - 40px); height: -moz-calc(100% - 40px); height: -webkit-calc(100% - 40px); width:260px; padding:20px; background: white; right:-300px; transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0px 0px 0px grey; } userbar.show { right:0; box-shadow: 0px 0px 12px grey; } userbar form,[data-is="userbar"] form{ width: 380px; margin: 4em auto; padding: 3em 2em 2em 2em; border: 1px solid #ebebeb; box-shadow: rgba(0,0,0,0.14902) 0px 1px 1px 0px,rgba(0,0,0,0.09804) 0px 1px 2px 0px; } userbar .group,[data-is="userbar"] .group{ position: relative; margin-bottom: 45px; } userbar input,[data-is="userbar"] input{ font-size: 18px; padding: 10px 10px 10px 5px; -webkit-appearance: none; display: block; color: #636363; width: 100%; border: none; border-radius: 0; border-bottom: 1px solid #757575; } userbar input:focus,[data-is="userbar"] input:focus{ outline: none; } userbar label,[data-is="userbar"] label{ color: #999; font-size: 18px; font-weight: normal; position: absolute; pointer-events: none; left: 5px; top: 10px; -webkit-transition:all 0.2s ease; transition: all 0.2s ease; } userbar input:focus ~ label,[data-is="userbar"] input:focus ~ label,userbar input.used ~ label,[data-is="userbar"] input.used ~ label{ top: -20px; -webkit-transform: scale(.75); transform: scale(.75); left: -2px; color: #4a89dc; } userbar .bar,[data-is="userbar"] .bar{ position: relative; display: block; width: 100%; } userbar .bar:before,[data-is="userbar"] .bar:before,userbar .bar:after,[data-is="userbar"] .bar:after{ content: \'\'; height: 2px; width: 0; bottom: 0px; position: absolute; background: #4a89dc; -webkit-transition:all 0.2s ease; transition: all 0.2s ease; } userbar .bar:before,[data-is="userbar"] .bar:before{ left: 50%; } userbar .bar:after,[data-is="userbar"] .bar:after{ right: 50%; } userbar input:focus ~ .bar:before,[data-is="userbar"] input:focus ~ .bar:before,userbar input:focus ~ .bar:after,[data-is="userbar"] input:focus ~ .bar:after{ width: 50%; } userbar .highlight,[data-is="userbar"] .highlight{ position: absolute; height: 60%; width: 100px; top: 25%; left: 0; pointer-events: none; opacity: 0.5; } userbar input:focus ~ .highlight,[data-is="userbar"] input:focus ~ .highlight{ -webkit-animation: inputHighlighter 0.3s ease; animation: inputHighlighter 0.3s ease; } @-webkit-keyframes inputHighlighter { from { background: #4a89dc; } to { width: 0; background: transparent; } } @keyframes inputHighlighter { from { background: #4a89dc; } to { width: 0; background: transparent; } } userbar .button,[data-is="userbar"] .button{ position: relative; display: inline-block; padding: 12px 24px; margin: .3em 0 1em 0; width: 100%; vertical-align: middle; color: #fff; font-size: 16px; line-height: 20px; -webkit-font-smoothing: antialiased; text-align: center; letter-spacing: 1px; background: transparent; border: 0; cursor: pointer; -webkit-transition:all 0.15s ease; transition: all 0.15s ease; } userbar .button:focus,[data-is="userbar"] .button:focus{ outline: 0; } userbar .buttonBlue,[data-is="userbar"] .buttonBlue{ background: #4a89dc; text-shadow: 1px 1px 0 rgba(39, 110, 204, .5); } userbar .buttonBlue:hover,[data-is="userbar"] .buttonBlue:hover{ background: #357bd8; } userbar .spinner,[data-is="userbar"] .spinner{ width: 40px; height: 40px; position: relative; margin: 100px auto; } userbar .double-bounce1,[data-is="userbar"] .double-bounce1,userbar .double-bounce2,[data-is="userbar"] .double-bounce2{ width: 100%; height: 100%; border-radius: 50%; background-color: #333; opacity: 0.6; position: absolute; top: 0; left: 0; -webkit-animation: sk-bounce 2.0s infinite ease-in-out; animation: sk-bounce 2.0s infinite ease-in-out; } userbar .double-bounce2,[data-is="userbar"] .double-bounce2{ -webkit-animation-delay: -1.0s; animation-delay: -1.0s; } @-webkit-keyframes sk-bounce { 0%, 100% { -webkit-transform: scale(0.0) } 50% { -webkit-transform: scale(1.0) } } @keyframes sk-bounce { 0%, 100% { transform: scale(0.0); -webkit-transform: scale(0.0); } 50% { transform: scale(1.0); -webkit-transform: scale(1.0); } } userbar .spinnerContainer,[data-is="userbar"] .spinnerContainer{ position: absolute; z-index: 1; width: 260; height: 100%; }', '', function(opts) {
 
 
-  this.noUser = !(!!KORTxyz.user);
-  this.buttontext = !(!!KORTxyz.user) ? "Login" : "Logout";
+  this.noUser = !(!!KORTxyz.user.name);
+  this.buttontext = !(!!KORTxyz.user.name) ? "Login" : "Logout";
 
   this.loading = false;
 
@@ -38359,17 +38425,20 @@ riot.tag2('userbar', '<div show="{noUser}"><div class="spinnerContainer" show="{
 
     if(this.buttontext == "Login"){
       if(this.refs.name.value.length>0){
-        this.loading = true;
 
+        that = this;
+
+        this.loading = true;
         name = this.refs.name.value;
         pw = this.refs.pw.value;
 
         xmlHttp=new XMLHttpRequest();
         xmlHttp.mozBackgroundRequest = true;
-        xmlHttp.onload = () =>{
+
+        xmlHttp.onloadend = () =>{
           this.loading = false;
-          this.noUser = !(!!KORTxyz.user);
-          this.buttontext = !(!!KORTxyz.user) ? "Login" : "Logout";
+          this.noUser = !(!!KORTxyz.user.name);
+          this.buttontext = !(!!KORTxyz.user.name) ? "Login" : "Logout";
           this.update();
         }
 
@@ -38385,6 +38454,7 @@ riot.tag2('userbar', '<div show="{noUser}"><div class="spinnerContainer" show="{
               localStorage.setItem('name',name);
               localStorage.setItem('pw',pw);
               KORTxyz.sources = [];
+
               xmlDoc = xmlHttp.responseXML.getElementsByTagName("FeatureType");
               for (var i = 0; i < xmlDoc.length; i++) {
                   KORTxyz.sources.push({
@@ -38396,28 +38466,37 @@ riot.tag2('userbar', '<div show="{noUser}"><div class="spinnerContainer" show="{
               alasql("DROP TABLE IF EXISTS sources; \
                       CREATE TABLE sources; \
                       SELECT * INTO sources FROM ?", [KORTxyz.sources],function(){});
-
           }
           else if(xmlHttp.readyState == 4 && xmlHttp.status != 200){
+
             iziToast.error({
               icon: 'material-icons',
               iconText: 'error',
                 message: 'Forkert Brugernavn/password'
             });
-            return false
+
           }
         };
-      }else{
+      }
+
+      else{
         iziToast.error({
           icon: 'material-icons',
           iconText: 'error',
             message: 'Skriv et brugernavn'
         });
       }
-    } else {
+    }
+
+    else {
       delete KORTxyz.user;
+      localStorage.removeItem('name');
+      localStorage.removeItem('pw');
       this.noUser = !(!!KORTxyz.user);
       this.buttontext = !(!!KORTxyz.user) ? "Login" : "Logout";
+
+      KORTxyz.sources = [];
+      alasql("DROP TABLE IF EXISTS sources;")
     }
 
    }.bind(this)

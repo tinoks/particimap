@@ -4,7 +4,7 @@ require('../../node_modules/mapbox-gl/dist/mapbox-gl.css');
 mapboxgl.accessToken = 'pk.eyJ1IjoidGlub2tzIiwiYSI6Ikp4OE0yWjQifQ.8ShzvCuk6zpjf9n_1pS_fA';
 map = new mapboxgl.Map({
     container: 'map', // container id
-    style: 'mapbox://styles/tinoks/cj1mhszqc002a2slpp5701ani', //stylesheet location
+    style: 'mapbox://styles/tinoks/cj1mhszqc002a2slpp5701ani?optimize=true', //stylesheet location
     maxZoom: 18,
     attributionControl: false});
 
@@ -291,4 +291,24 @@ addLuftfoto = function(){
 
 removeLuftfoto = function(){
     map.removeLayer('GST');
+}
+
+
+blink = function(data){
+  console.log(data);
+        var coordinates = data.coordinates[0][0];
+
+        // Pass the first coordinates in the LineString to `lngLatBounds` &
+        // wrap each coordinate pair in `extend` to include them in the bounds
+        // result. A variation of this technique could be applied to zooming
+        // to the bounds of multiple Points or Polygon geomteries - it just
+        // requires wrapping all the coordinates with the extend method.
+        var bounds = coordinates.reduce(function(bounds, coord) {
+            return bounds.extend(coord);
+        }, new mapboxgl.LngLatBounds(coordinates[0], coordinates[0]));
+
+
+        map.fitBounds(bounds, {
+          padding: 20
+        });
 }

@@ -100,7 +100,11 @@ alasql("CREATE INDEXEDDB DATABASE IF NOT EXISTS KORTxyz; \
         SELECT * FROM route;\
         CREATE TABLE IF NOT EXISTS sources; \
         SELECT * FROM sources;", function(e){
-          addData(e[4]);
-          addRoute(e[6]);
+          if(e[4].length>0){
+            addData(e[4]);
+          }
+          if(e[6].length>0){
+            addRoute(e[6]);
+          }
           KORTxyz.sources = e[8];
         });

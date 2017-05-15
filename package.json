@@ -23,6 +23,7 @@
     "mapbox-gl": "^0.36.0",
     "perfect-scrollbar": "^0.6.16",
     "riot-md-table": "0.0.2",
+    "turf": "^3.0.14",
     "underscore": "^1.8.3"
   },
   "devDependencies": {

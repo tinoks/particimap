@@ -32,6 +32,9 @@
     {icon:"directions",
      text:"Beregner den optimale rute mellem markerne."},
 
+    {icon:"sync",
+     text:"Synkronisere redigeringer med serveren."},
+
     {icon:"person",
      text:"Bruger login siden."},
     

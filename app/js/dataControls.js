@@ -165,3 +165,12 @@ directions = function(){
 
 
 }
+
+
+sync = function(elem){
+                  iziToast.show({
+                  icon: 'material-icons',
+                  iconText: 'sync',
+                    message: 'synkronisere.'
+                });
+}

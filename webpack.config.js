@@ -10,7 +10,8 @@ module.exports = {
   plugins: [
     new webpack.ProvidePlugin({
       riot: 'riot'
-    })
+    }),
+    new webpack.optimize.UglifyJsPlugin()
   ],
   module: {
     noParse:[/alasql/],

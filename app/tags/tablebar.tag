@@ -9,7 +9,7 @@
     </tr>
   </thead>
   <tbody>
-    <tr each={ elem, i in opts.data } onclick="alert('test')">
+    <tr each={ elem, i in opts.data } onclick={ zoomTo }>
       <td  no-reorder each={ d, val in elem} >{ elem[val] }</td>
     </tr>
   </tbody>
@@ -39,6 +39,7 @@
     table, th, td {
       border: 1px solid grey;
       border-collapse: collapse;
+      cursor: pointer;
       font-size: 10px;
     }
 
@@ -48,7 +49,6 @@
 
     th{
       letter-spacing: 1;
-      cursor: pointer;
     }
   </style>
 
@@ -59,6 +59,13 @@
      document.getElementsByTagName("tablebar")[0].classList.toggle("show");
     },1)
    });
+
+   zoomTo(e){
+    alasql("select geom from data where id=?",
+            e.item.elem.id,
+            res=>blink(res[0].geom)
+          )
+   }
 
    reorder(e) {
       opts.data.sort(function (a, b) {
