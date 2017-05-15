@@ -5,7 +5,8 @@
   "main": "./app/index.js",
   "scripts": {
     "dev": "webpack-dev-server --progress --inline --hot",
-    "build": "webpack"
+    "build": "webpack",
+    "min": "uglifyjs dist/bundle.js -m -o dist/bundle.min.js"
   },
   "keywords": [],
   "author": "Tino Kastbjerg Stigsen",
@@ -32,6 +33,8 @@
     "riot": "^3.4.2",
     "style-loader": "^0.16.1",
     "tag-loader": "^0.3.0",
+    "uglify-js": "^3.0.5",
+    "uglifyjs-webpack-plugin": "^0.4.3",
     "url-loader": "^0.5.8",
     "webpack": "^2.4.1",
     "webpack-dev-server": "^2.4.4"
