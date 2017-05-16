@@ -88,12 +88,12 @@ addGPS = function(){
   });
 
   getBearing = function(endLong,endLat){
-    start = map.getSource('point')._data.features[0].geometry.coordinates || [0,0];
-
-    startLat = start[1] * (Math.PI / 180);
-    startLong = start[0] * (Math.PI / 180);
-    endLat = endLat * (Math.PI / 180);
-    endLong = endLong * (Math.PI / 180);
+    var start = map.getSource('point')._data.features[0].geometry.coordinates;
+    if(typeof start == "undefined"){start=  [0,0]}
+    var startLat = start[1] * (Math.PI / 180);
+    var startLong = start[0] * (Math.PI / 180);
+    var endLat = endLat * (Math.PI / 180);
+    var endLong = endLong * (Math.PI / 180);
 
     var dLong = endLong - startLong;
 
@@ -114,6 +114,10 @@ addGPS = function(){
 
 
 updateGPS = function(crd){
+  map.easeTo({
+    bearing: KORTxyz.settings.followCompas ? crd.heading || getBearing(crd.longitude,crd.latitude) || 0 : 0,
+    center: [crd.longitude,crd.latitude]
+  })
   map.getSource('point').setData({
        "type": "FeatureCollection",
        "features": [{
@@ -125,10 +129,6 @@ updateGPS = function(crd){
            }
        }]
   });
-  map.easeTo({
-    bearing: KORTxyz.settings.followCompas ? crd.heading || getBearing(crd.longitude,crd.latitude) || 0 : 0,
-    center: [crd.longitude,crd.latitude]
-  })
 }
 
 
@@ -295,20 +295,18 @@ removeLuftfoto = function(){
 
 
 blink = function(data){
-  console.log(data);
-        var coordinates = data.coordinates[0][0];
+  var bounds = new mapboxgl.LngLatBounds();
 
-        // Pass the first coordinates in the LineString to `lngLatBounds` &
-        // wrap each coordinate pair in `extend` to include them in the bounds
-        // result. A variation of this technique could be applied to zooming
-        // to the bounds of multiple Points or Polygon geomteries - it just
-        // requires wrapping all the coordinates with the extend method.
-        var bounds = coordinates.reduce(function(bounds, coord) {
-            return bounds.extend(coord);
-        }, new mapboxgl.LngLatBounds(coordinates[0], coordinates[0]));
-
-
-        map.fitBounds(bounds, {
-          padding: 20
-        });
+  if(typeof data == "object"){
+    bounds.extend(data.coordinates[0][0]);
+  }
+  else{
+    data.map(e=>e.coordinates[0][0]).forEach(function(feature) {
+      bounds.extend(feature);
+    });
+  }
+ 
+  map.fitBounds(bounds, {
+    padding: 20
+  });
 }

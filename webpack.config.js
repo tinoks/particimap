@@ -1,6 +1,5 @@
 var path = require('path');
 var webpack = require('webpack');
-const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
 
 module.exports = {
   entry: './app/index.js',
@@ -11,8 +10,7 @@ module.exports = {
   plugins: [
     new webpack.ProvidePlugin({
       riot: 'riot'
-    }),
-    new UglifyJSPlugin()
+    })
   ],
   module: {
     noParse:[/alasql/],

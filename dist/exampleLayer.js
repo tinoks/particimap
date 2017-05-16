@@ -54,9 +54,8 @@ dataConfig = {
           if (xhttp.readyState == 4 && xhttp.status == 200) {
             alasql("UPDATE data SET Sync=1 WHERE id=?",currentData.id);
             dataConfig.sync();
-            console.log(xhttp.response);
           } else if (xhttp.readyState == 4 && xhttp.status != 200) {
-            console.log("ERROR");
+            console.error(xhttp.response);
           }
         }
         xhttp.send(postData);

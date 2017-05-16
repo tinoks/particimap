@@ -99,9 +99,9 @@ addData = function(data){
 				})
 			}else{
 				function style(feature){
-					config = dataConfig.Polygon["fill-color"];
-					prop = config.property;
-					match = config.stops.filter(e => e[0] == feature.properties[prop])[0];
+					var config = dataConfig.Polygon["fill-color"];
+					var prop = config.property;
+					var match = config.stops.filter(e => e[0] == feature.properties[prop])[0];
 					return {
 					  fillColor: typeof match != "undefined" ? match[1] : config.default
 					}
@@ -144,4 +144,13 @@ addLuftfoto = function(){
 removeLuftfoto = function(){
 	map.removeLayer(ortofoto);
 	basemap.addTo(map);
+}
+
+
+blink = function(data){
+	console.log(data)
+        map.fitBounds(L.geoJSON(data).getBounds(),{
+          padding: [20,20]
+        });
+
 }

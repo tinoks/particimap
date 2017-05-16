@@ -1,4 +1,4 @@
-table = function(el){
+toc = function(el){
 
   if(document.getElementsByTagName("tablebar").length == 1){
     document.getElementsByTagName("tablebar")[0].classList.toggle("show")
@@ -29,7 +29,7 @@ table = function(el){
 
 
 
-cloud_open = function(el){
+cloud_upload = function(el){
   if(document.getElementsByTagName("cloud_openbar").length == 1){
     document.getElementsByTagName("cloud_openbar")[0].classList.toggle("show")
     el.classList.toggle("show");
@@ -44,51 +44,6 @@ cloud_open = function(el){
     document.getElementsByTagName("cloud_openbar")[0].classList.toggle("show");
     el.classList.toggle("show");
   }
-}
-
-
-
-upload = function(){
-    var xmlhttp = new XMLHttpRequest();
-
-    xmlhttp.onreadystatechange = function() {
-        if (xmlhttp.readyState == XMLHttpRequest.DONE ) {
-           if (xmlhttp.status == 200) {
-               var response = JSON.parse(xmlhttp.responseText).features.map(function(e) {obj=e.properties; obj["geom"] = e.geometry; return obj});
-               addData(response);
-              alasql("DROP TABLE IF EXISTS data; \
-                      CREATE TABLE data; \
-                      SELECT * INTO data FROM ?", [response], 
-                      function(){
-                          iziToast.show({
-                            icon: 'material-icons',
-                            iconText: 'error',
-                            message: 'Data added!'
-                          });
-                      });
-           }
-           else if (xmlhttp.status == 400) {
-      		  iziToast.error({
-					   icon: 'material-icons',
-					   iconText: 'error',
-				      message: 'Error message 400'
-				    });
-           }
-           else {
-  	   			iziToast.error({
-  					  icon: 'material-icons',
-  					  iconText: 'error',
-  				    message: 'something else other than 200 was returned'
-				    });
-           }
-        }
-    };
-
-    xmlhttp.open("GET", "marker.json", true);
-    xmlhttp.send();
-
-
-
 }
 
 
@@ -168,9 +123,30 @@ directions = function(){
 
 
 sync = function(elem){
-                  iziToast.show({
-                  icon: 'material-icons',
-                  iconText: 'sync',
-                    message: 'synkronisere.'
-                });
+  iziToast.show({
+    icon: 'material-icons',
+    iconText: 'sync',
+    message: 'synkronisere.'
+  });
+  dataConfig.sync();
+  /*
+var xhttp = new XMLHttpRequest(),
+      postData = 
+      '<wfs:Transaction service="WFS" version="1.0.0" xmlns:topp="http://www.openplans.org/topp" xmlns:ogc="http://www.opengis.net/ogc" xmlns:wfs="http://www.opengis.net/wfs">'+
+      '<wfs:Update typeName="topp:Marker16">'+
+      '<wfs:Property><wfs:Name>AfgNavn</wfs:Name><wfs:Value>TINO2</wfs:Value></wfs:Property>'+
+      '<ogc:Filter><ogc:FeatureId fid="Marker16.1467"/></ogc:Filter></wfs:Update></wfs:Transaction>';
+    xhttp.open("POST", "http://80.241.215.222:8080/geoserver/wfs", true);
+    xhttp.withCredentials = true;
+
+    xhttp.setRequestHeader("Content-type", "text/xml;charset=utf-8");
+    xhttp.onreadystatechange = function() {
+      if (xhttp.readyState == 4 && xhttp.status == 200) {
+        console.log("OK");
+      } else if (xhttp.readyState == 4 && xhttp.status != 200) {
+        console.log("ERROR");
+      }
+    }
+    xhttp.send(postData);
+    */
 }

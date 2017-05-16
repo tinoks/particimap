@@ -63,8 +63,8 @@
 
         xmlHttp.open("GET",config.server+
                       "service=wfs&version=1.1.0&request=GetCapabilities",
-                      true,name,pw);
-
+                      true);
+        xmlHttp.withCredentials = true;
         xmlHttp.send(null);
 
         xmlHttp.onreadystatechange = function() {

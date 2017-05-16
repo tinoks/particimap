@@ -23,10 +23,17 @@
                           CREATE TABLE data; \
                           SELECT * INTO data FROM ?", [response], 
                           function(){
+                              document.getElementById('cloud_open').click();
                               iziToast.show({
                                 icon: 'material-icons',
                                 iconText: 'error',
-                                message: 'Data added!'
+                                message: 'Data added!',
+                                buttons: [
+                                  ['<button>Vis</button>', function (instance, toast) {
+
+                                      blink(response.map(e=>e.geom));
+                                  }]
+                                ]
                               });
                           });
                }
@@ -52,6 +59,8 @@
           "service=WFS&version=1.0.0&request=GetFeature&typeName="+name+
           "&maxFeatures=2000&outputFormat=application%2Fjson&srsName=EPSG:4326",
            true, KORTxyz.user.name,KORTxyz.user.pw);
+        xmlhttp.withCredentials = true;
+
         xmlhttp.send();
     }
   </script>

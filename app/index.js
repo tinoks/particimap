@@ -1,4 +1,3 @@
-riot = riot;
 KORTxyz = {
 	settings: {
 		followCompas: JSON.parse(localStorage.getItem('followCompas')),
@@ -21,7 +20,6 @@ Ps.initialize(document.getElementById('top'));
 
 iziToast = require('izitoast');
 require('../node_modules/izitoast/dist/css/iziToast.css');
-
 
  // SPECIAL RULES FOR MOBILE. Fix buttonclicks! 
 
