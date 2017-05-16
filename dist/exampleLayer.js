@@ -10,7 +10,7 @@ dataConfig = {
   },
   Polygon: {
     'fill-color': {
-                "property": "svar",
+                "property": "AfgKat",
                 "type": "categorical",
                 "default": "lightgrey",
                 "stops": [
@@ -22,22 +22,61 @@ dataConfig = {
   },
   popup:  function(f){
     return  '<h2>'+f.properties.AfgNavn+'</h2>'+
-            '<button onclick="dataConfig.wfsT(this)" id="JA '+f.properties.EjerNr+'" style="background-color:green;font-family:helvetica;border:0;width:50%;height:32px;">  JA  </button>'+
-            '<button onclick="dataConfig.wfsT(this)" id="NEJ '+f.properties.EjerNr+'" style="background-color:red;font-family:helvetica;border:0;width:50%;height:32px;">  NEJ  </button>'   
+            '<button onclick="dataConfig.updateData(this)" id="JA '+f.properties.id+'" style="background-color:green;font-family:helvetica;border:0;width:50%;height:32px;">  JA  </button>'+
+            '<button onclick="dataConfig.updateData(this)" id="NEJ '+f.properties.id+'" style="background-color:red;font-family:helvetica;border:0;width:50%;height:32px;">  NEJ  </button>'   
   },
-  wfsT: function(elem){
-    
-    dataConfig.updateData(elem.id.split(" ")[0],elem.id.split(" ")[1])
-  },
-  updateData: function(value,id){
-	  alasql(["UPDATE data SET svar='"+ value +"' WHERE EjerNr= "+id]).then(
+  updateData: function(elem){
+    var value = elem.id.split(" ")[0];
+    var id = elem.id.split(" ")[1];
+	  alasql(["UPDATE data SET AfgKat='"+ value +"',Sync=0 WHERE id='"+id+"'"]).then(
       alasql("Select * from data",function(e){
         updateData(e);
         popup.remove();
         }
       )
     )
-	}
+	},
+  sync: function(){
+    if(dataConfig.sync.running){
+      currentData = dataConfig.sync.data.pop();
+
+      if(currentData != undefined){
+        var xhttp = new XMLHttpRequest(),
+        postData = '<wfs:Transaction service="WFS" version="1.0.0" xmlns:topp="http://www.openplans.org/topp" xmlns:ogc="http://www.opengis.net/ogc" xmlns:wfs="http://www.opengis.net/wfs">'+
+        '<wfs:Update typeName="topp:Marker16">'+
+        '<wfs:Property><wfs:Name>AfgKat</wfs:Name><wfs:Value>'+currentData.AfgKat+'</wfs:Value></wfs:Property>'+
+        '<ogc:Filter><ogc:FeatureId fid="'+currentData.id+'"/></ogc:Filter></wfs:Update></wfs:Transaction>';
+
+        xhttp.open("POST", "http://80.241.215.222:8080/geoserver/wfs", true);
+        xhttp.setRequestHeader("Content-type", "text/xml;charset=utf-8");
+
+        xhttp.onreadystatechange = function() {
+          if (xhttp.readyState == 4 && xhttp.status == 200) {
+            alasql("UPDATE data SET Sync=1 WHERE id=?",currentData.id);
+            dataConfig.sync();
+            console.log(xhttp.response);
+          } else if (xhttp.readyState == 4 && xhttp.status != 200) {
+            console.log("ERROR");
+          }
+        }
+        xhttp.send(postData);
+      }else{
+        dataConfig.sync.running = false;
+          iziToast.show({
+            icon: 'material-icons',
+            iconText: 'sync',
+            message: 'Alt synkroniseret.'
+          });
+      }
+
+    } else {
+      dataConfig.sync.running = true;
+      alasql("SELECT id,AfgKat FROM data WHERE Sync=0",function(e){
+        dataConfig.sync.data = e;
+        dataConfig.sync();
+      })
+    }
+  }
 }
   
 
