@@ -6,9 +6,10 @@ require('../../node_modules/leaflet/dist/leaflet.css');
 map = L.map('map',{
 	preferCanvas:true,
 	attributionControl: false, 
-	zoomControl:false
-});
+	zoomControl:false,
 
+});
+L.control.scale({imperial:false}).addTo(map);
 
 var bbox = localStorage.getItem('bbox');
 if(bbox){
@@ -148,9 +149,8 @@ removeLuftfoto = function(){
 
 
 blink = function(data){
-	console.log(data)
-        map.fitBounds(L.geoJSON(data).getBounds(),{
-          padding: [20,20]
-        });
+	map.fitBounds(L.geoJSON(data).getBounds(),{
+	  padding: [50,50]
+	});
 
 }

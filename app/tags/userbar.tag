@@ -56,16 +56,19 @@
 
         xmlHttp.onloadend = () =>{
           this.loading = false;
-          this.noUser = !(!!KORTxyz.user.name);
-          this.buttontext = !(!!KORTxyz.user.name) ? "Login" : "Logout";
+          this.noUser = !(!!KORTxyz.user);
+          this.buttontext = !(!!KORTxyz.user) ? "Login" : "Logout";
           this.update();
         }
 
         xmlHttp.open("GET",config.server+
                       "service=wfs&version=1.1.0&request=GetCapabilities",
-                      true);
-        xmlHttp.withCredentials = true;
-        xmlHttp.send(null);
+                      true,name,pw);
+        try{
+          xmlHttp.send(null);
+        }catch(e){
+         alert(e.message);
+        }
 
         xmlHttp.onreadystatechange = function() {
           if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {

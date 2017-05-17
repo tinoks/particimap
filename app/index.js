@@ -19,7 +19,7 @@ require('./css/perfect-scrollbar.css');
 Ps.initialize(document.getElementById('top'));
 
 iziToast = require('izitoast');
-require('../node_modules/izitoast/dist/css/iziToast.css');
+require('./css/iziToast.css');
 
  // SPECIAL RULES FOR MOBILE. Fix buttonclicks! 
 

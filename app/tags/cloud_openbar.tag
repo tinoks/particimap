@@ -59,7 +59,7 @@
           "service=WFS&version=1.0.0&request=GetFeature&typeName="+name+
           "&maxFeatures=2000&outputFormat=application%2Fjson&srsName=EPSG:4326",
            true, KORTxyz.user.name,KORTxyz.user.pw);
-        xmlhttp.withCredentials = true;
+        //xmlhttp.withCredentials = true;
 
         xmlhttp.send();
     }

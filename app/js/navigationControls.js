@@ -42,8 +42,9 @@ fullscreen = function(el){
 }
 
 gps = function(el){
+	console.log(el.classList);
 	if(el.classList[0] == "off"){
-		el.classList = "on";
+		el.className = "on";
 		addGPS();
 
 		function success(pos) {
@@ -60,13 +61,13 @@ gps = function(el){
 				icon: 'material-icons',iconText: 'error',
 			    message: err.message
 			});
-			el.classList = "off";
+			el.className = "off";
 		};
 
 		id = navigator.geolocation.watchPosition(success, error,{enableHighAccuracy: true,timeout: 60000, maximumAge: 60000});
 	} else {
 		navigator.geolocation.clearWatch(id);
-		el.classList = "off";
+		el.className = "off";
 		removeGPS();
 	}
 }

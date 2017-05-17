@@ -161,8 +161,12 @@ addData = function(data){
       data: {"type": "FeatureCollection","features": data.map(function(obj) {
                 returndata = {"type": "Feature", "properties":{}};
                   Object.keys(obj).map(function(objectKey, index) {
-                  if(objectKey != "geom"){ returndata.properties[objectKey] = obj[objectKey] }
-                else{ returndata.geometry = obj[objectKey]; }
+                   if(objectKey != "geom"){
+                    returndata.properties[objectKey] = obj[objectKey] 
+                   }
+                   else{ 
+                    returndata.geometry = obj[objectKey]; 
+                   }
                   });
                 return returndata;
               })
@@ -296,8 +300,8 @@ removeLuftfoto = function(){
 
 blink = function(data){
   var bounds = new mapboxgl.LngLatBounds();
-
-  if(typeof data == "object"){
+  console.log(data);
+  if(data.length == undefined){
     bounds.extend(data.coordinates[0][0]);
   }
   else{
@@ -307,6 +311,6 @@ blink = function(data){
   }
  
   map.fitBounds(bounds, {
-    padding: 20
+    padding: 200
   });
 }
