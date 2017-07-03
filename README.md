@@ -1,1 +1,3 @@
-"# RFV2017" 
+# Particimap
+
+Collaboration on a webmap

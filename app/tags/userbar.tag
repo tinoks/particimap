@@ -52,7 +52,7 @@
         pw = this.refs.pw.value;
         
         xmlHttp=new XMLHttpRequest();
-        xmlHttp.mozBackgroundRequest = true;
+        //xmlHttp.mozBackgroundRequest = true;
 
         xmlHttp.onloadend = () =>{
           this.loading = false;
